@@ -53,7 +53,15 @@ public class HermesClient {
      */
     public String chat(String message) {
         validateNotEmpty(message, "消息内容不能为空");
-        return chatWithSystemPrompt(null, message);
+        log.info(">>> chat() 请求: {}", maskContent(message));
+        try {
+            String result = chatWithSystemPrompt(null, message);
+            log.info("<<< chat() 响应: {} chars", result.length());
+            return result;
+        } catch (HermesException e) {
+            log.error("<<< chat() 失败: {}", e.getMessage());
+            throw e;
+        }
     }
     
     /**
@@ -61,6 +69,9 @@ public class HermesClient {
      */
     public String chatWithSystemPrompt(String systemPrompt, String userMessage) {
         validateNotEmpty(userMessage, "用户消息不能为空");
+        
+        log.debug("chatWithSystemPrompt() systemPrompt={}, userMessage={}", 
+            systemPrompt != null ? "有" : "无", maskContent(userMessage));
         
         OpenAIRequest request = new OpenAIRequest();
         request.setModel(config.getModel());
@@ -263,6 +274,15 @@ public class HermesClient {
             return "***";
         }
         return token.substring(0, 4) + "***" + token.substring(token.length() - 4);
+    }
+    
+    /**
+     * 内容脱敏（截断长文本）
+     */
+    private String maskContent(String content) {
+        if (content == null) return "null";
+        if (content.length() <= 50) return content;
+        return content.substring(0, 50) + "...(length=" + content.length() + ")";
     }
     
     // ========== Getter ==========
