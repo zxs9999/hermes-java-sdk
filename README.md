@@ -28,14 +28,12 @@ Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、
 | 特性 | 说明 |
 |------|------|
 | **分层设计** | Core（底层）→ Api（原始）→ Sdk（业务）三层分离 |
-| **异常细分** | HermesException → Network / Auth / Api 三类，可精准处理 |
+| **异常细分** | HermesException → Network / Api 两类，可精准处理 |
 | **重试机制** | 指数退避（1s → 2s → 4s），最多 3 次 |
 | **线程安全** | ThreadSafeChatSession / CopyOnWriteArrayList |
 | **异步支持** | CompletableFuture + thenAccept |
 | **日志框架** | Log4j2 2.24.1 + SLF4J，统一事件码 |
-| **HTTPS 强制** | requireHttps(true) 防止明文泄露 |
-| **健康检查** | 简单 + 详细两种模式 |
-| **Builder 模式** | 不可变配置，编译期校验 |
+| **极简配置** | 只需 baseUrl，无需 apiKey / model |
 
 ## 快速开始
 
@@ -54,22 +52,20 @@ Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、
 ```yaml
 hermes:
   base-url: ${HERMES_BASE_URL:http://localhost:8080}
-  # api-key 从 HERMES_API_KEY 环境变量读取
 ```
 
 ### 3. 使用示例
 
 ```java
-// 创建客户端
+// 创建客户端（只需 baseUrl）
 HermesClient hermes = HermesClient.builder()
     .baseUrl(System.getenv("HERMES_BASE_URL"))
-    .apiKey(System.getenv("HERMES_API_KEY"))
     .build();
 
 // 聊天
 String result = hermes.chat("你好，Hermes！");
 
-// 带 Skill 激活
+// 激活 Skill
 String result = hermes.activateSkill("karpathy-principles", "重构 auth 模块");
 
 // 线程安全多轮对话
@@ -77,6 +73,11 @@ ThreadSafeChatSession session = hermes.newThreadSafeSession();
 session.chat("我想写小说");
 session.chat("都市异能题材");
 String novel = session.chat("开始写第1章");
+
+// 健康检查
+if (hermes.healthCheck()) {
+    System.out.println("连接正常");
+}
 ```
 
 ## 三层 API 详解
@@ -211,7 +212,6 @@ src/main/java/com/hermes/sdk/
 ├── exception/
 │   ├── HermesException.java
 │   ├── HermesApiException.java
-│   ├── HermesAuthException.java
 │   └── HermesNetworkException.java
 ├── logging/
 │   ├── HermesLogger.java       — 统一日志入口
