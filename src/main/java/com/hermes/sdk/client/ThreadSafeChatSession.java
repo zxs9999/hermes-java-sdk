@@ -7,26 +7,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 多轮对话会话
  * 
- * 线程安全，使用 CopyOnWriteArrayList
+ * 线程安全版本，使用 CopyOnWriteArrayList
  * 
  * 用法:
- *   ChatSession session = hermes.newSession();
+ *   ChatSession session = hermes.newThreadSafeSession();
  *   session.chat("我想写小说");
  *   session.chat("都市异能题材");
  *   String result = session.chat("开始写第1章");
  */
 @Slf4j
-public class ChatSession {
+public class ThreadSafeChatSession {
     
     private final HermesClient client;
     private final HermesConfig config;
     private final CopyOnWriteArrayList<Message> history;
     
-    public ChatSession(HermesClient client, HermesConfig config) {
+    public ThreadSafeChatSession(HermesClient client, HermesConfig config) {
         this.client = client;
         this.config = config;
         this.history = new CopyOnWriteArrayList<>();
