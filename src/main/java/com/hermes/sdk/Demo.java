@@ -2,7 +2,13 @@ package com.hermes.sdk;
 
 import com.hermes.sdk.client.HermesClient;
 import com.hermes.sdk.client.ThreadSafeChatSession;
-import com.hermes.sdk.service.SkillService;
+import com.hermes.sdk.dto.Session;
+import com.hermes.sdk.dto.Skill;
+import com.hermes.sdk.dto.Toolset;
+import com.hermes.sdk.service.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Hermes SDK 使用示例
@@ -63,7 +69,85 @@ public class Demo {
                 return null;
             });
         
-        // 8. 异常处理示例
+        // ========== ApiServerService ==========
+        System.out.println("\n=== ApiServerService ===");
+        ApiServerService apiServerService = new ApiServerService(
+            hermes.getConfig(), hermes.getHttpClient(), hermes.getObjectMapper()
+        );
+        
+        // 列出所有 Skills
+        System.out.println("\n--- Skills 列表 ---");
+        List<Skill> skills = apiServerService.listSkills();
+        skills.forEach(s -> System.out.println("  " + s.getName() + ": " + s.getDescription()));
+        
+        // 列出所有 Toolsets
+        System.out.println("\n--- Toolsets 列表 ---");
+        List<Toolset> toolsets = apiServerService.listToolsets();
+        toolsets.forEach(t -> System.out.println("  " + t.getName() + " (enabled=" + t.isEnabled() + ")"));
+        
+        // API 能力清单
+        System.out.println("\n--- API Capabilities ---");
+        Map<String, Object> caps = apiServerService.getCapabilities();
+        System.out.println("  endpoints: " + caps.keySet());
+        
+        // 可用模型列表
+        System.out.println("\n--- Models ---");
+        Map<String, Object> models = apiServerService.listModels();
+        System.out.println("  " + models);
+        
+        // 详细健康检查
+        System.out.println("\n--- Health Detailed ---");
+        Map<String, Object> health = apiServerService.healthDetailed();
+        System.out.println("  " + health);
+        
+        // ========== SessionService ==========
+        System.out.println("\n=== SessionService ===");
+        SessionService sessionService = new SessionService(
+            hermes.getConfig(), hermes.getHttpClient(), hermes.getObjectMapper()
+        );
+        
+        // 列出所有会话
+        System.out.println("\n--- Sessions 列表 ---");
+        List<Session> sessions = sessionService.list(10, 0);
+        sessions.forEach(s -> System.out.println("  " + s.getSessionId() + ": " + s.getTitle()));
+        
+        // 创建空白会话
+        System.out.println("\n--- 创建会话 ---");
+        Session newSession = sessionService.create();
+        System.out.println("  created: " + newSession.getSessionId());
+        
+        // 在会话中聊天
+        System.out.println("\n--- 会话聊天 ---");
+        // sessionService.chat(newSession.getSessionId(), "你好");
+        
+        // 删除会话
+        System.out.println("\n--- 删除会话 ---");
+        sessionService.delete(newSession.getSessionId());
+        System.out.println("  deleted: " + newSession.getSessionId());
+        
+        // ========== RunService ==========
+        System.out.println("\n=== RunService ===");
+        RunService runService = new RunService(
+            hermes.getConfig(), hermes.getHttpClient(), hermes.getObjectMapper()
+        );
+        
+        // 启动异步 Agent
+        System.out.println("\n--- 启动异步 Agent ---");
+        Map<String, Object> runResult = runService.startRun("帮我搜索 GitHub", null, null, null, null, false);
+        String runId = (String) runResult.get("run_id");
+        System.out.println("  run_id: " + runId);
+        
+        // 查询运行状态
+        System.out.println("\n--- 查询运行状态 ---");
+        Map<String, Object> status = runService.getRunStatus(runId);
+        System.out.println("  status: " + status.get("status"));
+        
+        // 中断 Agent
+        System.out.println("\n--- 中断 Agent ---");
+        runService.stopRun(runId);
+        System.out.println("  stopped: " + runId);
+        
+        // ========== 异常处理示例 ==========
         System.out.println("\n=== 异常处理 ===");
         try {
             hermes.chat("");

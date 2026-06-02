@@ -42,6 +42,17 @@ public class HermesClient {
         this.objectMapper = new ObjectMapper();
     }
     
+    // ========== Getters（供 Service 层使用）==========
+    
+    /** 获取配置 */
+    public HermesConfig getConfig() { return config; }
+    
+    /** 获取 HTTP 客户端 */
+    public OkHttpClient getHttpClient() { return httpClient; }
+    
+    /** 获取 ObjectMapper */
+    public ObjectMapper getObjectMapper() { return objectMapper; }
+    
     private OkHttpClient buildHttpClient(Builder builder) {
         return new OkHttpClient.Builder()
             .connectTimeout(Duration.ofSeconds(config.getConnectTimeout()))
