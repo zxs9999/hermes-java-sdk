@@ -15,6 +15,8 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import com.hermes.sdk.exception.HermesNetworkException;
 
 /**
  * API Server 服务
@@ -60,7 +62,6 @@ public class ApiServerService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -69,7 +70,7 @@ public class ApiServerService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.SKILLS_LIST, resp.code(), body);
-                throw new HermesApiException("SKILLS_LIST", resp.code(), body);
+                throw new HermesApiException("SKILLS_LIST: " + body, resp.code());
             }
             
             JsonNode node = mapper.readTree(body);
@@ -105,7 +106,6 @@ public class ApiServerService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -114,7 +114,7 @@ public class ApiServerService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.TOOLSETS_LIST, resp.code(), body);
-                throw new HermesApiException("TOOLSETS_LIST", resp.code(), body);
+                throw new HermesApiException("TOOLSETS_LIST: " + body, resp.code());
             }
             
             JsonNode node = mapper.readTree(body);
@@ -150,7 +150,6 @@ public class ApiServerService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -159,7 +158,7 @@ public class ApiServerService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.CAPABILITIES_GET, resp.code(), body);
-                throw new HermesApiException("CAPABILITIES_GET", resp.code(), body);
+                throw new HermesApiException("CAPABILITIES_GET: " + body, resp.code());
             }
             
             Map<String, Object> capabilities = mapper.readValue(body, 
@@ -192,7 +191,6 @@ public class ApiServerService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -201,7 +199,7 @@ public class ApiServerService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.MODELS_LIST, resp.code(), body);
-                throw new HermesApiException("MODELS_LIST", resp.code(), body);
+                throw new HermesApiException("MODELS_LIST: " + body, resp.code());
             }
             
             Map<String, Object> models = mapper.readValue(body, 
@@ -262,7 +260,6 @@ public class ApiServerService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -271,7 +268,7 @@ public class ApiServerService {
             
             if (!resp.isSuccessful()) {
                 log.warn("[{}] 失败: http={}, body={}", LogEvents.HEALTH_CHECK_DETAILED, resp.code(), body);
-                throw new HermesApiException("HEALTH_DETAILED", resp.code(), body);
+                throw new HermesApiException("HEALTH_DETAILED: " + body, resp.code());
             }
             
             Map<String, Object> health = mapper.readValue(body, 

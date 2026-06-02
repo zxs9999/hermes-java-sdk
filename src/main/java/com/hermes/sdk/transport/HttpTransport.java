@@ -3,6 +3,7 @@ package com.hermes.sdk.transport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hermes.sdk.config.HermesConfig;
 import com.hermes.sdk.exception.HermesApiException;
+import com.hermes.sdk.exception.HermesException;
 import com.hermes.sdk.exception.HermesNetworkException;
 import com.hermes.sdk.logging.HermesLogger;
 import com.hermes.sdk.logging.LogEvents;
@@ -61,7 +62,7 @@ public class HttpTransport implements Transport {
         try {
             json = mapper.writeValueAsString(body);
         } catch (Exception e) {
-            throw new HermesApiException("JSON_ENCODE", -1, e.getMessage());
+            throw new HermesApiException(e.getMessage(), -1);
         }
         
         RequestBody requestBody = RequestBody.create(json, MediaType.parse("application/json"));
@@ -80,7 +81,7 @@ public class HttpTransport implements Transport {
         try {
             json = mapper.writeValueAsString(body);
         } catch (Exception e) {
-            throw new HermesApiException("JSON_ENCODE", -1, e.getMessage());
+            throw new HermesApiException(e.getMessage(), -1);
         }
         
         RequestBody requestBody = RequestBody.create(json, MediaType.parse("application/json"));
@@ -134,7 +135,7 @@ public class HttpTransport implements Transport {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] API 错误: http={}, body={}", LogEvents.HTTP_ERROR, resp.code(), body);
-                throw new HermesApiException(method + " " + path, resp.code(), body);
+                throw new HermesApiException(method + " " + path + ": " + body, resp.code());
             }
             
             log.debug("[{}] 成功: http={}, bodyLen={}", LogEvents.HTTP_RESPONSE, resp.code(), body.length());

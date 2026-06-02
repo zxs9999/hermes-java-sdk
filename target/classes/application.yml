@@ -1,0 +1,18 @@
+# Hermes SDK Spring Boot 配置
+spring:
+  application:
+    name: hermes-sdk
+
+# Hermes 配置（其他参数使用 Builder 默认值）
+hermes:
+  base-url: ${HERMES_BASE_URL:http://localhost:8080}
+
+# Server 配置
+server:
+  port: 8081
+
+# 日志配置
+logging:
+  level:
+    com.hermes.sdk: INFO
+    okhttp3: WARN

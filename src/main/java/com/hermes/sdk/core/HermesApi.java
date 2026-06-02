@@ -12,6 +12,8 @@ import okhttp3.OkHttpClient;
 
 import java.util.List;
 import java.util.Map;
+import com.hermes.sdk.exception.HermesException;
+import org.slf4j.Logger;
 
 /**
  * Hermes 原始 API 服务
@@ -39,7 +41,7 @@ public class HermesApi extends ApiServerCore {
             log.info("[{}] 成功: count={}", LogEvents.SKILLS_LIST, skills.size());
             return skills;
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_SKILLS", -1, e.getMessage());
+            throw new HermesApiException("PARSE_SKILLS: " + e.getMessage(), -1);
         }
     }
     
@@ -53,7 +55,7 @@ public class HermesApi extends ApiServerCore {
             log.info("[{}] 成功: count={}", LogEvents.TOOLSETS_LIST, toolsets.size());
             return toolsets;
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_TOOLSETS", -1, e.getMessage());
+            throw new HermesApiException("PARSE_TOOLSETS: " + e.getMessage(), -1);
         }
     }
     
@@ -64,7 +66,7 @@ public class HermesApi extends ApiServerCore {
         try {
             return mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_CAPABILITIES", -1, e.getMessage());
+            throw new HermesApiException("PARSE_CAPABILITIES: " + e.getMessage(), -1);
         }
     }
     
@@ -75,7 +77,7 @@ public class HermesApi extends ApiServerCore {
         try {
             return mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_MODELS", -1, e.getMessage());
+            throw new HermesApiException("PARSE_MODELS: " + e.getMessage(), -1);
         }
     }
     
@@ -100,7 +102,7 @@ public class HermesApi extends ApiServerCore {
         try {
             return mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_HEALTH", -1, e.getMessage());
+            throw new HermesApiException("PARSE_HEALTH: " + e.getMessage(), -1);
         }
     }
     
@@ -116,7 +118,7 @@ public class HermesApi extends ApiServerCore {
             log.info("[{}] 成功: count={}", LogEvents.SESSION_LIST, sessions.size());
             return sessions;
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_SESSIONS", -1, e.getMessage());
+            throw new HermesApiException("PARSE_SESSIONS: " + e.getMessage(), -1);
         }
     }
     
@@ -128,7 +130,7 @@ public class HermesApi extends ApiServerCore {
             JsonNode node = mapper.readTree(body);
             return mapper.treeToValue(node.get("session"), Session.class);
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_SESSION", -1, e.getMessage());
+            throw new HermesApiException("PARSE_SESSION: " + e.getMessage(), -1);
         }
     }
     
@@ -146,7 +148,7 @@ public class HermesApi extends ApiServerCore {
             JsonNode node = mapper.readTree(body);
             return mapper.treeToValue(node.get("session"), Session.class);
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_SESSION", -1, e.getMessage());
+            throw new HermesApiException("PARSE_SESSION: " + e.getMessage(), -1);
         }
     }
     
@@ -165,7 +167,7 @@ public class HermesApi extends ApiServerCore {
             JsonNode node = mapper.readTree(body);
             return mapper.convertValue(node.get("data"), new TypeReference<List<Message>>() {});
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_MESSAGES", -1, e.getMessage());
+            throw new HermesApiException("PARSE_MESSAGES: " + e.getMessage(), -1);
         }
     }
     
@@ -187,7 +189,7 @@ public class HermesApi extends ApiServerCore {
         try {
             return mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_RUN", -1, e.getMessage());
+            throw new HermesApiException("PARSE_RUN: " + e.getMessage(), -1);
         }
     }
     
@@ -198,7 +200,7 @@ public class HermesApi extends ApiServerCore {
         try {
             return mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_RUN_STATUS", -1, e.getMessage());
+            throw new HermesApiException("PARSE_RUN_STATUS: " + e.getMessage(), -1);
         }
     }
     
@@ -209,7 +211,7 @@ public class HermesApi extends ApiServerCore {
         try {
             return mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_RUN_APPROVAL", -1, e.getMessage());
+            throw new HermesApiException("PARSE_RUN_APPROVAL: " + e.getMessage(), -1);
         }
     }
     
@@ -220,7 +222,7 @@ public class HermesApi extends ApiServerCore {
         try {
             return mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
-            throw new HermesApiException("PARSE_RUN_STOP", -1, e.getMessage());
+            throw new HermesApiException("PARSE_RUN_STOP: " + e.getMessage(), -1);
         }
     }
     

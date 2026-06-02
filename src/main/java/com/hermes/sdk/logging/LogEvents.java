@@ -22,7 +22,6 @@ public final class LogEvents {
     public static final String SKILL_ASYNC_ERROR = "HERMES_SKILL_ASYNC_ERROR";
     
     // ========== ChatSession ==========
-    public static final String SESSION_CREATE = "HERMES_SESSION_CREATE";
     public static final String SESSION_CLEAR   = "HERMES_SESSION_CLEAR";
     
     // ========== Config ==========
@@ -38,14 +37,14 @@ public final class LogEvents {
     public static final String HTTP_RESPONSE = "HERMES_HTTP_RESPONSE";
     public static final String HTTP_ERROR    = "HERMES_HTTP_ERROR";
     
-    // ========== SessionService (API Server) ==========
+    // ========== SessionService ==========
     public static final String SESSION_LIST      = "HERMES_SESSION_LIST";
     public static final String SESSION_GET       = "HERMES_SESSION_GET";
     public static final String SESSION_CREATE    = "HERMES_SESSION_CREATE";
     public static final String SESSION_DELETE    = "HERMES_SESSION_DELETE";
     public static final String SESSION_MESSAGES  = "HERMES_SESSION_MESSAGES";
     
-    // ========== RunService (API Server) ==========
+    // ========== RunService ==========
     public static final String RUN_START   = "HERMES_RUN_START";
     public static final String RUN_STATUS  = "HERMES_RUN_STATUS";
     public static final String RUN_EVENTS  = "HERMES_RUN_EVENTS";
@@ -57,5 +56,5 @@ public final class LogEvents {
     public static final String TOOLSETS_LIST     = "HERMES_TOOLSETS_LIST";
     public static final String CAPABILITIES_GET  = "HERMES_CAPABILITIES_GET";
     public static final String MODELS_LIST       = "HERMES_MODELS_LIST";
-    public static final String HEALTH_CHECK_DETAILED = "HERMES_HEALTH_DETAILED";
+    public static final String HEALTH_CHECK_DETAILED = "HERMES_HEALTH_CHECK_DETAILED";
 }

@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import com.hermes.sdk.exception.HermesException;
 
 /**
  * Session 管理服务
@@ -59,7 +61,6 @@ public class SessionService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -68,7 +69,7 @@ public class SessionService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.SESSION_LIST, resp.code(), body);
-                throw new HermesApiException("SESSION_LIST", resp.code(), body);
+                throw new HermesApiException("SESSION_LIST: " + body, resp.code());
             }
             
             List<Session> sessions = mapper.readValue(body, new TypeReference<List<Session>>() {});
@@ -104,7 +105,6 @@ public class SessionService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -113,7 +113,7 @@ public class SessionService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.SESSION_GET, resp.code(), body);
-                throw new HermesApiException("SESSION_GET", resp.code(), body);
+                throw new HermesApiException("SESSION_GET: " + body, resp.code());
             }
             
             return mapper.readValue(body, Session.class);
@@ -139,7 +139,6 @@ public class SessionService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .post(RequestBody.create("", MediaType.parse("application/json")))
             .build();
         
@@ -148,7 +147,7 @@ public class SessionService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.SESSION_CREATE, resp.code(), body);
-                throw new HermesApiException("SESSION_CREATE", resp.code(), body);
+                throw new HermesApiException("SESSION_CREATE: " + body, resp.code());
             }
             
             Session session = mapper.readValue(body, Session.class);
@@ -177,7 +176,6 @@ public class SessionService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .delete()
             .build();
         
@@ -186,7 +184,7 @@ public class SessionService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.SESSION_DELETE, resp.code(), body);
-                throw new HermesApiException("SESSION_DELETE", resp.code(), body);
+                throw new HermesApiException("SESSION_DELETE: " + body, resp.code());
             }
             
             log.info("[{}] 成功: sessionId={}", LogEvents.SESSION_DELETE, sessionId);
@@ -214,7 +212,6 @@ public class SessionService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -223,7 +220,7 @@ public class SessionService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.SESSION_MESSAGES, resp.code(), body);
-                throw new HermesApiException("SESSION_MESSAGES", resp.code(), body);
+                throw new HermesApiException("SESSION_MESSAGES: " + body, resp.code());
             }
             
             List<Map<String, Object>> messages = mapper.readValue(body, 

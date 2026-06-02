@@ -22,6 +22,25 @@ public class OpenAIRequest {
         this.maxTokens = 4096;
     }
     
+    /**
+     * 简单用户消息
+     */
+    public OpenAIRequest(String userMessage) {
+        this();
+        addUserMessage(userMessage);
+    }
+    
+    /**
+     * 系统消息 + 用户消息
+     */
+    public OpenAIRequest(String systemPrompt, String userMessage) {
+        this();
+        if (systemPrompt != null && !systemPrompt.isEmpty()) {
+            addSystemMessage(systemPrompt);
+        }
+        addUserMessage(userMessage);
+    }
+    
     public void addMessage(String role, String content) {
         this.messages.add(Map.of("role", role, "content", content));
     }

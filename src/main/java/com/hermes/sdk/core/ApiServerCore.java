@@ -3,12 +3,15 @@ package com.hermes.sdk.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hermes.sdk.config.HermesConfig;
 import com.hermes.sdk.exception.HermesApiException;
+import com.hermes.sdk.exception.HermesException;
 import com.hermes.sdk.exception.HermesNetworkException;
 import com.hermes.sdk.logging.HermesLogger;
 import com.hermes.sdk.logging.LogEvents;
 import okhttp3.*;
+import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Core API — Hermes 原始 API 封装
@@ -60,7 +63,7 @@ public class ApiServerCore {
         try {
             json = mapper.writeValueAsString(body);
         } catch (Exception e) {
-            throw new HermesApiException("JSON_ENCODE", -1, e.getMessage());
+            throw new HermesApiException("JSON_ENCODE: " + e.getMessage(), -1);
         }
         
         RequestBody requestBody = RequestBody.create(json, MediaType.parse("application/json"));
@@ -81,7 +84,7 @@ public class ApiServerCore {
         try {
             json = mapper.writeValueAsString(body);
         } catch (Exception e) {
-            throw new HermesApiException("JSON_ENCODE", -1, e.getMessage());
+            throw new HermesApiException("JSON_ENCODE: " + e.getMessage(), -1);
         }
         
         RequestBody requestBody = RequestBody.create(json, MediaType.parse("application/json"));
@@ -118,7 +121,7 @@ public class ApiServerCore {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] API 错误: http={}, body={}", LogEvents.HTTP_ERROR, resp.code(), body);
-                throw new HermesApiException(method + " " + path, resp.code(), body);
+                throw new HermesApiException(method + " " + path + ": " + body, resp.code());
             }
             
             log.debug("[{}] 成功: http={}, bodyLen={}", LogEvents.HTTP_RESPONSE, resp.code(), body.length());

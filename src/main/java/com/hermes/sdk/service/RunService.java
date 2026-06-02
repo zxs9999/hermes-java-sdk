@@ -14,6 +14,7 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
 
 /**
  * Run 服务
@@ -63,15 +64,18 @@ public class RunService {
         if (sessionId != null) body.put("session_id", sessionId);
         if (systemPrompt != null) body.put("system_prompt", systemPrompt);
         if (stream != null) body.put("stream", stream);
-        
-        RequestBody requestBody = RequestBody.create(
-            mapper.writeValueAsString(body),
-            MediaType.parse("application/json")
-        );
+
+        String jsonBody;
+        try {
+            jsonBody = mapper.writeValueAsString(body);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new HermesApiException("RUN_START: JSON encode error", -1);
+        }
+
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .post(requestBody)
             .build();
         
@@ -80,7 +84,7 @@ public class RunService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.RUN_START, resp.code(), respBody);
-                throw new HermesApiException("RUN_START", resp.code(), respBody);
+                throw new HermesApiException("RUN_START: " + respBody, resp.code());
             }
             
             Map<String, Object> result = mapper.readValue(respBody, 
@@ -120,7 +124,6 @@ public class RunService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get()
             .build();
         
@@ -129,7 +132,7 @@ public class RunService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.RUN_STATUS, resp.code(), body);
-                throw new HermesApiException("RUN_STATUS", resp.code(), body);
+                throw new HermesApiException("RUN_STATUS: " + body, resp.code());
             }
             
             Map<String, Object> status = mapper.readValue(body, 
@@ -162,15 +165,18 @@ public class RunService {
         
         Map<String, Object> body = new java.util.HashMap<>();
         body.put("approval", approval);
-        
-        RequestBody requestBody = RequestBody.create(
-            mapper.writeValueAsString(body),
-            MediaType.parse("application/json")
-        );
+
+        String jsonBody;
+        try {
+            jsonBody = mapper.writeValueAsString(body);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new HermesApiException("RUN_APPROVAL: JSON encode error", -1);
+        }
+
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .post(requestBody)
             .build();
         
@@ -179,7 +185,7 @@ public class RunService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.RUN_APPROVAL, resp.code(), respBody);
-                throw new HermesApiException("RUN_APPROVAL", resp.code(), respBody);
+                throw new HermesApiException("RUN_APPROVAL: " + respBody, resp.code());
             }
             
             Map<String, Object> result = mapper.readValue(respBody, 
@@ -212,7 +218,6 @@ public class RunService {
         
         Request request = new Request.Builder()
             .url(url)
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .post(RequestBody.create("", MediaType.parse("application/json")))
             .build();
         
@@ -221,7 +226,7 @@ public class RunService {
             
             if (!resp.isSuccessful()) {
                 log.error("[{}] 失败: http={}, body={}", LogEvents.RUN_STOP, resp.code(), body);
-                throw new HermesApiException("RUN_STOP", resp.code(), body);
+                throw new HermesApiException("RUN_STOP: " + body, resp.code());
             }
             
             Map<String, Object> result = mapper.readValue(body, 
