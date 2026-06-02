@@ -31,7 +31,7 @@ class HermesExceptionTest {
     void testAuthException() {
         HermesAuthException e = new HermesAuthException("API Key无效");
         assertEquals("AUTH_ERROR", e.getErrorCode());
-        assertEquals(-1, e.getHttpStatus());
+        assertEquals(401, e.getHttpStatus());
     }
     
     @Test

@@ -1,8 +1,7 @@
 package com.hermes.sdk.client;
 
 import com.hermes.sdk.config.HermesConfig;
-import com.hermes.sdk.exception.HermesAuthException;
-import com.hermes.sdk.exception.HermesNetworkException;
+import com.hermes.sdk.transport.TransportType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,50 +12,38 @@ import static org.junit.jupiter.api.Assertions.*;
 class HermesClientTest {
     
     @Test
-    void testBuilder() {
-        HermesClient client = HermesClient.builder()
-            .baseUrl("https://api.hermes.com")
-            .apiKey("***")
-            .model("gpt-4")
-            .connectTimeout(30)
-            .readTimeout(180)
-            .temperature(0.7)
-            .maxTokens(4096)
-            .maxRetries(3)
-            .requireHttps(true)
-            .build();
-        
-        assertEquals("https://api.hermes.com", client.getBaseUrl());
-        assertEquals("gpt-4", client.getModel());
-    }
-    
-    @Test
     void testBuilderDefaultValues() {
         HermesClient client = HermesClient.builder()
             .baseUrl("https://api.hermes.com")
-            .apiKey("sk-test")
             .build();
         
-        assertEquals("http://localhost:8080", client.getBaseUrl());
-        assertEquals("gpt-4", client.getModel());
+        assertEquals("https://api.hermes.com", client.getBaseUrl());
+        assertEquals(TransportType.HTTP, client.getConfig().getTransportType());
+        assertEquals(30, client.getConfig().getConnectTimeout());
+        assertEquals(180, client.getConfig().getReadTimeout());
+        assertEquals(3, client.getConfig().getMaxRetries());
     }
     
     @Test
-    void testBuilderRequireHttps() {
-        assertThrows(SecurityException.class, () -> {
-            HermesClient.builder()
-                .baseUrl("http://insecure.com")
-                .apiKey("sk-test")
-                .requireHttps(true)
-                .build();
-        });
+    void testBuilderCustomValues() {
+        HermesClient client = HermesClient.builder()
+            .baseUrl("https://api.hermes.com")
+            .transportType(TransportType.HTTP)
+            .connectTimeout(60)
+            .readTimeout(300)
+            .maxRetries(5)
+            .build();
+        
+        assertEquals("https://api.hermes.com", client.getBaseUrl());
+        assertEquals(60, client.getConfig().getConnectTimeout());
+        assertEquals(300, client.getConfig().getReadTimeout());
+        assertEquals(5, client.getConfig().getMaxRetries());
     }
     
     @Test
     void testChatEmptyMessage() {
         HermesClient client = HermesClient.builder()
             .baseUrl("https://api.hermes.com")
-            .apiKey("sk-test")
             .build();
         
         assertThrows(IllegalArgumentException.class, () -> {
@@ -68,7 +55,6 @@ class HermesClientTest {
     void testChatNullMessage() {
         HermesClient client = HermesClient.builder()
             .baseUrl("https://api.hermes.com")
-            .apiKey("sk-test")
             .build();
         
         assertThrows(IllegalArgumentException.class, () -> {
@@ -77,10 +63,31 @@ class HermesClientTest {
     }
     
     @Test
+    void testChatWithSystemPromptEmptyMessage() {
+        HermesClient client = HermesClient.builder()
+            .baseUrl("https://api.hermes.com")
+            .build();
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            client.chatWithSystemPrompt("You are helpful", "");
+        });
+    }
+    
+    @Test
+    void testChatWithSystemPromptNullMessage() {
+        HermesClient client = HermesClient.builder()
+            .baseUrl("https://api.hermes.com")
+            .build();
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            client.chatWithSystemPrompt("You are helpful", null);
+        });
+    }
+    
+    @Test
     void testActivateSkillEmptyName() {
         HermesClient client = HermesClient.builder()
             .baseUrl("https://api.hermes.com")
-            .apiKey("sk-test")
             .build();
         
         assertThrows(IllegalArgumentException.class, () -> {
@@ -92,7 +99,6 @@ class HermesClientTest {
     void testActivateSkillNullTask() {
         HermesClient client = HermesClient.builder()
             .baseUrl("https://api.hermes.com")
-            .apiKey("sk-test")
             .build();
         
         assertThrows(IllegalArgumentException.class, () -> {
@@ -101,13 +107,43 @@ class HermesClientTest {
     }
     
     @Test
-    void testNewSession() {
+    void testActivateSkillEmptyTask() {
         HermesClient client = HermesClient.builder()
             .baseUrl("https://api.hermes.com")
-            .apiKey("sk-test")
             .build();
         
-        assertNotNull(client.newSession());
-        assertNotNull(client.newThreadSafeSession());
+        assertThrows(IllegalArgumentException.class, () -> {
+            client.activateSkill("skill-name", "");
+        });
+    }
+    
+    @Test
+    void testHealthCheck() {
+        HermesClient client = HermesClient.builder()
+            .baseUrl("http://localhost:9999")
+            .connectTimeout(1)
+            .readTimeout(1)
+            .build();
+        
+        // localhost:9999 不存在，healthCheck 返回 false
+        assertFalse(client.healthCheck());
+    }
+    
+    @Test
+    void testGetConfig() {
+        HermesClient client = HermesClient.builder()
+            .baseUrl("https://api.hermes.com")
+            .transportType(TransportType.HTTP)
+            .connectTimeout(45)
+            .readTimeout(120)
+            .maxRetries(2)
+            .build();
+        
+        HermesConfig config = client.getConfig();
+        assertEquals("https://api.hermes.com", config.getBaseUrl());
+        assertEquals(TransportType.HTTP, config.getTransportType());
+        assertEquals(45, config.getConnectTimeout());
+        assertEquals(120, config.getReadTimeout());
+        assertEquals(2, config.getMaxRetries());
     }
 }
