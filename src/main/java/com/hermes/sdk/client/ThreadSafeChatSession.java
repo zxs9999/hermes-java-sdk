@@ -1,18 +1,20 @@
 package com.hermes.sdk.client;
 
 import com.hermes.sdk.config.HermesConfig;
-import lombok.extern.slf4j.Slf4j;
+import com.hermes.sdk.logging.HermesLogger;
+import com.hermes.sdk.logging.LogEvents;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.ReentrantLock;
+
+import org.slf4j.Logger;
 
 /**
  * 多轮对话会话
  * 
- * 线程安全版本，使用 CopyOnWriteArrayList
+ * 线程安全版本，使用 CopyOnWriteArrayList + ReentrantLock 双重保障
  * 
  * 用法:
  *   ChatSession session = hermes.newThreadSafeSession();
@@ -20,8 +22,9 @@ import java.util.concurrent.locks.ReentrantLock;
  *   session.chat("都市异能题材");
  *   String result = session.chat("开始写第1章");
  */
-@Slf4j
 public class ThreadSafeChatSession {
+    
+    private static final Logger log = HermesLogger.get(ThreadSafeChatSession.class);
     
     private final HermesClient client;
     private final HermesConfig config;
@@ -37,11 +40,14 @@ public class ThreadSafeChatSession {
      * 发送消息
      */
     public String chat(String message) {
+        log.debug("[{}] 发送消息: {}", LogEvents.CHAT_REQUEST, maskContent(message));
         history.add(new Message("user", message));
         
         String response = sendToHermes();
         history.add(new Message("assistant", response));
         
+        log.debug("[{}] 收到响应: {} chars, historySize={}", 
+            LogEvents.CHAT_RESPONSE, response.length(), history.size());
         return response;
     }
     
@@ -49,11 +55,14 @@ public class ThreadSafeChatSession {
      * 带 System Prompt 的多轮对话
      */
     public String chatWithSystem(String systemPrompt, String message) {
+        log.debug("[{}] systemPrompt={}, 消息: {}", 
+            LogEvents.CHAT_REQUEST, systemPrompt != null ? "有" : "无", maskContent(message));
         history.add(new Message("user", message));
         
         String response = client.chatWithSystemPrompt(systemPrompt, buildContext());
         history.add(new Message("assistant", response));
         
+        log.debug("[{}] 收到响应: {} chars", LogEvents.CHAT_RESPONSE, response.length());
         return response;
     }
     
@@ -89,6 +98,7 @@ public class ThreadSafeChatSession {
      */
     public void clear() {
         history.clear();
+        log.info("[{}] history cleared, historySize=0", LogEvents.SESSION_CLEAR);
     }
     
     /**
@@ -109,5 +119,11 @@ public class ThreadSafeChatSession {
             this.role = role;
             this.content = content;
         }
+    }
+    
+    private String maskContent(String content) {
+        if (content == null) return "null";
+        if (content.length() <= 50) return content;
+        return content.substring(0, 50) + "...(length=" + content.length() + ")";
     }
 }

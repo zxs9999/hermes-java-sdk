@@ -4,18 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hermes.sdk.config.HermesConfig;
 import com.hermes.sdk.exception.*;
+import com.hermes.sdk.logging.HermesLogger;
+import com.hermes.sdk.logging.LogEvents;
 import com.hermes.sdk.request.OpenAIRequest;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Hermes Java SDK 客户端
  * 
- * 线程安全，支持重试，异常细分
+ * 线程安全，支持重试，异常细分，日志完善
  * 
  * 用法:
  *   HermesClient hermes = new HermesClient.Builder()
@@ -27,8 +28,9 @@ import java.util.concurrent.TimeUnit;
  *   String result = hermes.chat("分析代码");
  *   String result = hermes.activateSkill("karpathy-principles", "重构 auth 模块");
  */
-@Slf4j
 public class HermesClient {
+    
+    private static final Logger log = HermesLogger.get(HermesClient.class);
     
     private final HermesConfig config;
     private final OkHttpClient httpClient;
@@ -53,13 +55,14 @@ public class HermesClient {
      */
     public String chat(String message) {
         validateNotEmpty(message, "消息内容不能为空");
-        log.info(">>> chat() 请求: {}", maskContent(message));
+        log.info("[{}] >>> chat() 请求: {}", LogEvents.CHAT_REQUEST, maskContent(message));
         try {
             String result = chatWithSystemPrompt(null, message);
-            log.info("<<< chat() 响应: {} chars", result.length());
+            log.info("[{}] <<< chat() 响应: {} chars", LogEvents.CHAT_RESPONSE, result.length());
             return result;
         } catch (HermesException e) {
-            log.error("<<< chat() 失败: {}", e.getMessage());
+            log.error("[{}] <<< chat() 失败: errorCode={}, httpStatus={}, msg={}", 
+                LogEvents.CHAT_ERROR, e.getErrorCode(), e.getHttpStatus(), e.getMessage());
             throw e;
         }
     }
@@ -70,8 +73,10 @@ public class HermesClient {
     public String chatWithSystemPrompt(String systemPrompt, String userMessage) {
         validateNotEmpty(userMessage, "用户消息不能为空");
         
-        log.debug("chatWithSystemPrompt() systemPrompt={}, userMessage={}", 
-            systemPrompt != null ? "有" : "无", maskContent(userMessage));
+        log.debug("[{}] systemPrompt={}, userMessage={}", 
+            LogEvents.CHAT_REQUEST,
+            systemPrompt != null ? "有" : "无", 
+            maskContent(userMessage));
         
         OpenAIRequest request = new OpenAIRequest();
         request.setModel(config.getModel());
@@ -100,7 +105,8 @@ public class HermesClient {
         } catch (HermesNetworkException e) {
             if (attempt < config.getMaxRetries()) {
                 int delay = (int) Math.pow(2, attempt) * 1000; // 指数退避: 1s, 2s, 4s
-                log.warn("网络异常，第 {} 次重试，延迟 {}ms: {}", attempt + 1, delay, e.getMessage());
+                log.warn("[{}] attempt={}, delay={}ms, msg={}", 
+                    LogEvents.RETRY_NETWORK, attempt + 1, delay, e.getMessage());
                 sleep(delay);
                 return executeWithRetry(request, json, attempt + 1);
             }
@@ -108,7 +114,8 @@ public class HermesClient {
         } catch (HermesApiException e) {
             if (isRetryable(e) && attempt < config.getMaxRetries()) {
                 int delay = (int) Math.pow(2, attempt) * 1000;
-                log.warn("API 异常，第 {} 次重试，延迟 {}ms: {}", attempt + 1, delay, e.getMessage());
+                log.warn("[{}] attempt={}, delay={}ms, httpStatus={}, msg={}", 
+                    LogEvents.RETRY_API, attempt + 1, delay, e.getHttpStatus(), e.getMessage());
                 sleep(delay);
                 return executeWithRetry(request, json, attempt + 1);
             }
@@ -137,6 +144,9 @@ public class HermesClient {
         validateNotEmpty(skillName, "Skill 名称不能为空");
         validateNotEmpty(task, "任务描述不能为空");
         
+        log.info("[{}] skillName={}, task={}", 
+            LogEvents.SKILL_ACTIVATE, skillName, maskContent(task));
+        
         String systemPrompt = String.format(
             "先执行 skill_view(name='%s') 加载技能指南，然后严格按照技能指南执行任务。",
             skillName
@@ -148,6 +158,7 @@ public class HermesClient {
      * 多轮对话会话
      */
     public ChatSession newSession() {
+        log.debug("[{}]", LogEvents.SESSION_CREATE);
         return new ChatSession(this, config);
     }
     
@@ -155,6 +166,7 @@ public class HermesClient {
      * 线程安全的多轮对话会话
      */
     public ThreadSafeChatSession newThreadSafeSession() {
+        log.debug("[{}] threadSafe=true", LogEvents.SESSION_CREATE);
         return new ThreadSafeChatSession(this, config);
     }
     
@@ -162,6 +174,7 @@ public class HermesClient {
      * 健康检查
      */
     public boolean healthCheck() {
+        log.info("[{}] url={}", LogEvents.HEALTH_CHECK, config.getBaseUrl() + "/api/hermes/health");
         try {
             String url = config.getBaseUrl() + "/api/hermes/health";
             Request request = new Request.Builder()
@@ -170,10 +183,13 @@ public class HermesClient {
                 .build();
             
             try (Response response = httpClient.newCall(request).execute()) {
-                return response.isSuccessful();
+                boolean healthy = response.isSuccessful();
+                log.info("[{}] result={}, httpStatus={}", 
+                    LogEvents.HEALTH_CHECK, healthy, response.code());
+                return healthy;
             }
         } catch (IOException e) {
-            log.debug("健康检查失败: {}", e.getMessage());
+            log.warn("[{}] failed: {}", LogEvents.HEALTH_CHECK, e.getMessage());
             return false;
         }
     }

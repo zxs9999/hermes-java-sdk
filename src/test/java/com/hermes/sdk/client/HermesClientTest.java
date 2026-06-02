@@ -16,7 +16,7 @@ class HermesClientTest {
     void testBuilder() {
         HermesClient client = HermesClient.builder()
             .baseUrl("https://api.hermes.com")
-            .apiKey("sk-test-key-123")
+            .apiKey("***")
             .model("gpt-4")
             .connectTimeout(30)
             .readTimeout(180)
