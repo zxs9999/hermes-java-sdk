@@ -1,6 +1,6 @@
 # Hermes Java SDK
 
-Hermes Agent Java SDK，支持 Spring Boot 3.x
+Hermes Agent Java SDK，支持 Spring Boot 2.x
 
 ## 功能
 
