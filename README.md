@@ -1,6 +1,6 @@
 # Hermes Java SDK
 
-Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、线程安全、异步支持。
+Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、线程安全、传输层可扩展。
 
 ## 分层架构
 
@@ -19,7 +19,12 @@ Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、
 │    ├─ Sessions CRUD + Messages               │
 │    └─ Runs 异步启动/查询/审批/停止           │
 ├─────────────────────────────────────────────┤
-│  ApiServerCore — HTTP 底层（GET/POST/PATCH/DELETE）
+│  Transport 接口                              │
+│    ├─ HttpTransport     ✓ 当前实现          │
+│    ├─ RpcTransport      ○ 占位（RPC 待实现） │
+│    └─ WebSocketTransport ○ 占位（WS 待实现） │
+├─────────────────────────────────────────────┤
+│  OkHttp / Log4j2 / Jackson — 底层依赖        │
 └─────────────────────────────────────────────┘
 ```
 
@@ -27,7 +32,8 @@ Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、
 
 | 特性 | 说明 |
 |------|------|
-| **分层设计** | Core（底层）→ Api（原始）→ Sdk（业务）三层分离 |
+| **分层设计** | Core/Api/Sdk/Client 四层分离，职责清晰 |
+| **传输层抽象** | Transport 接口，支持 HTTP/RPC/WebSocket 切换 |
 | **异常细分** | HermesException → Network / Api 两类，可精准处理 |
 | **重试机制** | 指数退避（1s → 2s → 4s），最多 3 次 |
 | **线程安全** | ThreadSafeChatSession / CopyOnWriteArrayList |
@@ -154,22 +160,38 @@ boolean healthy = api.health();
 Map<String, Object> detailed = api.healthDetailed();
 ```
 
-### ApiServerCore（HTTP 底层）
+### Transport（传输层）
 
-如果需要直接构造 HTTP 请求：
+可替换的传输层实现：
 
 ```java
-ApiServerCore core = new ApiServerCore(config, httpClient, mapper);
+// HTTP（默认）
+Transport transport = new HttpTransport(config, httpClient, mapper);
 
-// GET
-String body = core.get("v1/skills");
+// 切换到 WebSocket（未来）
+HermesClient hermes = HermesClient.builder()
+    .baseUrl("wss://api.hermes.com")
+    .transportType(TransportType.WEBSOCKET)
+    .build();
 
-// POST
-String body = core.post("v1/runs", Map.of("message", "hello"));
-
-// 带查询参数
-String body = core.get("api/sessions", Map.of("limit", "10", "offset", "0"));
+// 切换到 RPC（未来）
+HermesClient hermes = HermesClient.builder()
+    .baseUrl("localhost:50051")
+    .transportType(TransportType.RPC)
+    .build();
 ```
+
+## 传输层扩展
+
+| 类型 | 状态 | 说明 |
+|------|------|------|
+| **HttpTransport** | ✓ 已实现 | 基于 OkHttp，当前默认 |
+| **RpcTransport** | ○ 占位符 | gRPC/Thrift 待实现 |
+| **WebSocketTransport** | ○ 占位符 | SSE/WebSocket 待实现 |
+
+未来扩展只需：
+1. 实现 `Transport` 接口
+2. 在 `HermesClient.Builder` 选择传输类型
 
 ## 日志事件码
 
@@ -199,34 +221,35 @@ src/main/java/com/hermes/sdk/
 ├── controller/
 │   └── HermesController.java   — REST API
 ├── core/
-│   ├── ApiServerCore.java      — HTTP 底层
 │   └── HermesApi.java          — 原始 API
 ├── dto/
-│   ├── ChatRequest.java        — 聊天请求
-│   ├── Message.java            — 消息
-│   ├── Run.java                — Run
-│   ├── Session.java            — 会话
-│   ├── Skill.java              — Skill
-│   ├── SkillRequest.java       — Skill 请求
-│   └── Toolset.java            — Toolset
+│   ├── ChatRequest.java
+│   ├── Message.java
+│   ├── Run.java
+│   ├── Session.java
+│   ├── Skill.java
+│   ├── SkillRequest.java
+│   └── Toolset.java
 ├── exception/
 │   ├── HermesException.java
 │   ├── HermesApiException.java
 │   └── HermesNetworkException.java
 ├── logging/
-│   ├── HermesLogger.java       — 统一日志入口
-│   └── LogEvents.java          — 日志事件码
+│   ├── HermesLogger.java
+│   └── LogEvents.java
 ├── sdk/
 │   └── HermesSdk.java          — 业务封装
-│       ├── SessionManager     — 会话管理
-│       ├── ToolsetManager     — Toolset 查询
-│       ├── SkillExecutor      — Skill 执行
-│       └── SystemMonitor      — 系统监控
-└── service/
-    ├── SkillService.java       — Skill 便捷调用
-    ├── ApiServerService.java   — API Server 服务
-    ├── SessionService.java     — 会话服务
-    └── RunService.java         — Run 服务
+├── service/
+│   ├── SkillService.java
+│   ├── ApiServerService.java
+│   ├── SessionService.java
+│   └── RunService.java
+└── transport/
+    ├── Transport.java          — 接口定义
+    ├── TransportType.java      — HTTP/RPC/WEBSOCKET
+    ├── HttpTransport.java       — 当前实现
+    ├── RpcTransport.java       — 占位符
+    └── WebSocketTransport.java — 占位符
 
 src/main/resources/
 ├── application.yml
