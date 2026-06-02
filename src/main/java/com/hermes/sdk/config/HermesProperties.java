@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * application.yml 中配置：
  *   hermes:
  *     base-url: http://localhost:8080
- *     api-key: your-key
+ *     api-key: ${HERMES_API_KEY}  # 从环境变量读取，不写死
  *     model: gpt-4
  */
 @Data

@@ -11,8 +11,9 @@ public class Demo {
     
     public static void main(String[] args) {
         // 1. 创建客户端（Builder 模式）
+        // API Key 从环境变量 HERMES_API_KEY 读取
         HermesClient hermes = HermesClient.builder()
-            .baseUrl("http://localhost:8080")
+            .baseUrl(System.getenv("HERMES_BASE_URL"))
             .apiKey(System.getenv("HERMES_API_KEY"))
             .model("gpt-4")
             .temperature(0.7)
