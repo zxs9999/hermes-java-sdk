@@ -25,11 +25,9 @@ public class HermesAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public HermesClient hermesClient(HermesProperties properties) {
-        log.info("[{}] baseUrl={}, model={}", 
-            LogEvents.CONFIG_INIT, properties.getBaseUrl(), properties.getModel());
+        log.info("[{}] baseUrl={}", LogEvents.CONFIG_INIT, properties.getBaseUrl());
         HermesClient client = HermesClient.builder()
             .baseUrl(properties.getBaseUrl())
-            .model(properties.getModel())
             .build();
         log.info("[{}] HermesClient 初始化完成, baseUrl={}", 
             LogEvents.CONFIG_INIT, properties.getBaseUrl());

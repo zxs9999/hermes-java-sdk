@@ -45,14 +45,9 @@ public class ApiServerCore {
         if (queryParams != null) {
             queryParams.forEach(urlBuilder::addQueryParameter);
         }
-        
         Request.Builder reqBuilder = new Request.Builder()
             .url(urlBuilder.build())
             .get();
-        
-        if (config.getModel() != null) {
-            reqBuilder.addHeader("X-Hermes-Model", config.getModel());
-        }
         
         return execute(reqBuilder.build(), "GET", path);
     }
