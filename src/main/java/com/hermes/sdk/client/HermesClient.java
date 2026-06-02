@@ -7,6 +7,8 @@ import com.hermes.sdk.exception.*;
 import com.hermes.sdk.logging.HermesLogger;
 import com.hermes.sdk.logging.LogEvents;
 import com.hermes.sdk.request.OpenAIRequest;
+import com.hermes.sdk.transport.Transport;
+import com.hermes.sdk.transport.TransportType;
 import okhttp3.*;
 import org.slf4j.Logger;
 
@@ -16,11 +18,12 @@ import java.time.Duration;
 /**
  * Hermes Java SDK 客户端
  * 
- * 线程安全，支持重试，异常细分，日志完善
+ * 线程安全，支持重试，异常细分，日志完善，支持多种传输层
  * 
  * 用法:
  *   HermesClient hermes = HermesClient.builder()
  *       .baseUrl("https://api.hermes.com")
+ *       .transportType(TransportType.HTTP)  // 默认 HTTP
  *       .maxRetries(3)
  *       .build();
  *   
@@ -34,11 +37,33 @@ public class HermesClient {
     private final HermesConfig config;
     private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final Transport transport;
     
     public HermesClient(Builder builder) {
         this.config = builder.build();
         this.httpClient = buildHttpClient(builder);
         this.objectMapper = new ObjectMapper();
+        this.transport = createTransport();
+    }
+    
+    private OkHttpClient buildHttpClient(Builder builder) {
+        HermesConfig cfg = builder.build();
+        return new OkHttpClient.Builder()
+            .connectTimeout(Duration.ofSeconds(cfg.getConnectTimeout()))
+            .readTimeout(Duration.ofSeconds(cfg.getReadTimeout()))
+            .retryOnConnectionFailure(false)
+            .build();
+    }
+    
+    private Transport createTransport() {
+        if (config.getTransportType() == TransportType.RPC) {
+            throw new UnsupportedOperationException("RPC 传输层待实现");
+        }
+        if (config.getTransportType() == TransportType.WEBSOCKET) {
+            throw new UnsupportedOperationException("WebSocket 传输层待实现");
+        }
+        // 默认 HTTP
+        return new com.hermes.sdk.transport.HttpTransport(config, httpClient, objectMapper);
     }
     
     // ========== Getters（供 Service 层使用）==========
@@ -46,15 +71,8 @@ public class HermesClient {
     public HermesConfig getConfig() { return config; }
     public OkHttpClient getHttpClient() { return httpClient; }
     public ObjectMapper getObjectMapper() { return objectMapper; }
+    public Transport getTransport() { return transport; }
     public String getBaseUrl() { return config.getBaseUrl(); }
-    
-    private OkHttpClient buildHttpClient(Builder builder) {
-        return new OkHttpClient.Builder()
-            .connectTimeout(Duration.ofSeconds(config.getConnectTimeout()))
-            .readTimeout(Duration.ofSeconds(config.getReadTimeout()))
-            .retryOnConnectionFailure(false)
-            .build();
-    }
     
     // ========== 聊天接口 ==========
     
@@ -241,12 +259,18 @@ public class HermesClient {
     
     public static class Builder {
         private String baseUrl = "http://localhost:8080";
+        private TransportType transportType = TransportType.HTTP;
         private int connectTimeout = 30;
         private int readTimeout = 180;
         private int maxRetries = 3;
         
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
+            return this;
+        }
+        
+        public Builder transportType(TransportType transportType) {
+            this.transportType = transportType;
             return this;
         }
         
