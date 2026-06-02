@@ -34,19 +34,21 @@ export HERMES_API_KEY=sk-***
 export HERMES_BASE_URL=https://api.hermes.com
 ```
 
-### 2. application.yml
+### 2. application.yml（只需 base-url，其他用默认值）
 
 ```yaml
 hermes:
   base-url: ${HERMES_BASE_URL:http://localhost:8080}
-  # api-key 从 HERMES_API_KEY 环境变量读取，不写死在配置中
-  model: gpt-4
-  temperature: 0.7
-  max-tokens: 4096
-  connect-timeout: 30
-  read-timeout: 180
-  max-retries: 3
-  require-https: true
+  # api-key 从 HERMES_API_KEY 环境变量读取
+
+# 其他参数均为默认值，无需配置：
+#   model: gpt-4
+#   temperature: 0.7
+#   max-tokens: 4096
+#   connect-timeout: 30
+#   read-timeout: 180
+#   max-retries: 3
+#   require-https: true
 ```
 
 ### 3. 使用 HermesClient
