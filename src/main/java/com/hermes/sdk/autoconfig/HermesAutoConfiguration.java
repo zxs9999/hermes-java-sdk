@@ -29,7 +29,6 @@ public class HermesAutoConfiguration {
             LogEvents.CONFIG_INIT, properties.getBaseUrl(), properties.getModel());
         HermesClient client = HermesClient.builder()
             .baseUrl(properties.getBaseUrl())
-            .apiKey(properties.getApiKey())
             .model(properties.getModel())
             .build();
         log.info("[{}] HermesClient 初始化完成, baseUrl={}", 

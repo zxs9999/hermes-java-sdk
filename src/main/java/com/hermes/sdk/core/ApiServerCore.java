@@ -3,7 +3,6 @@ package com.hermes.sdk.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hermes.sdk.config.HermesConfig;
 import com.hermes.sdk.exception.HermesApiException;
-import com.hermes.sdk.exception.HermesAuthException;
 import com.hermes.sdk.exception.HermesNetworkException;
 import com.hermes.sdk.logging.HermesLogger;
 import com.hermes.sdk.logging.LogEvents;
@@ -35,7 +34,7 @@ public class ApiServerCore {
      * GET 请求
      */
     protected String get(String path) throws HermesException {
-        return get(path, null);
+        return get(path, (Map<String, String>) null);
     }
     
     protected String get(String path, Map<String, String> queryParams) throws HermesException {
@@ -49,7 +48,6 @@ public class ApiServerCore {
         
         Request.Builder reqBuilder = new Request.Builder()
             .url(urlBuilder.build())
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .get();
         
         if (config.getModel() != null) {
@@ -74,7 +72,6 @@ public class ApiServerCore {
         Request request = new Request.Builder()
             .url(HttpUrl.parse(config.getBaseUrl()).newBuilder()
                 .addPathSegments(path.replaceFirst("^/", "")).build())
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .post(requestBody)
             .build();
         
@@ -96,7 +93,6 @@ public class ApiServerCore {
         Request request = new Request.Builder()
             .url(HttpUrl.parse(config.getBaseUrl()).newBuilder()
                 .addPathSegments(path.replaceFirst("^/", "")).build())
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .patch(requestBody)
             .build();
         
@@ -110,7 +106,6 @@ public class ApiServerCore {
         Request request = new Request.Builder()
             .url(HttpUrl.parse(config.getBaseUrl()).newBuilder()
                 .addPathSegments(path.replaceFirst("^/", "")).build())
-            .addHeader("Authorization", "Bearer " + config.getApiKey())
             .delete()
             .build();
         
@@ -126,11 +121,6 @@ public class ApiServerCore {
         try (Response resp = httpClient.newCall(request).execute()) {
             String body = resp.body().string();
             
-            if (resp.code() == 401 || resp.code() == 403) {
-                log.error("[{}] 认证失败: http={}", LogEvents.HTTP_ERROR, resp.code());
-                throw new HermesAuthException("API_KEY_INVALID", resp.code(), body);
-            }
-            
             if (!resp.isSuccessful()) {
                 log.error("[{}] API 错误: http={}, body={}", LogEvents.HTTP_ERROR, resp.code(), body);
                 throw new HermesApiException(method + " " + path, resp.code(), body);
@@ -139,7 +129,7 @@ public class ApiServerCore {
             log.debug("[{}] 成功: http={}, bodyLen={}", LogEvents.HTTP_RESPONSE, resp.code(), body.length());
             return body;
             
-        } catch (HermesException e) {
+        } catch (HermesApiException e) {
             throw e;
         } catch (IOException e) {
             log.error("[{}] 网络异常: {}", LogEvents.HTTP_ERROR, e.getMessage());

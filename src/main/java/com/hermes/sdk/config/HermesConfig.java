@@ -14,9 +14,6 @@ public class HermesConfig {
     /** Hermes Gateway 地址 */
     private final String baseUrl;
     
-    /** API Key */
-    private final String apiKey;
-    
     /** 默认模型 */
     private final String model;
     
@@ -40,7 +37,6 @@ public class HermesConfig {
     
     private HermesConfig(Builder builder) {
         this.baseUrl = builder.baseUrl;
-        this.apiKey = builder.apiKey;
         this.model = builder.model;
         this.connectTimeout = builder.connectTimeout;
         this.readTimeout = builder.readTimeout;
@@ -54,16 +50,11 @@ public class HermesConfig {
         return new Builder();
     }
     
-    public static HermesConfig defaults(String baseUrl, String apiKey) {
-        return builder().baseUrl(baseUrl).apiKey(apiKey).build();
-    }
-    
     /**
      * Builder 模式
      */
     public static class Builder {
         private String baseUrl = "http://localhost:8080";
-        private String apiKey;
         private String model = "gpt-4";
         private int connectTimeout = 30;
         private int readTimeout = 180;
@@ -74,11 +65,6 @@ public class HermesConfig {
         
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
-            return this;
-        }
-        
-        public Builder apiKey(String apiKey) {
-            this.apiKey = apiKey;
             return this;
         }
         

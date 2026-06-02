@@ -20,11 +20,9 @@ import java.util.Map;
 public class Demo {
     
     public static void main(String[] args) throws Exception {
-        // ========== 1. 创建 HermesClient ==========
+        // 1. 创建客户端（Builder 模式）
         HermesClient hermes = HermesClient.builder()
             .baseUrl(System.getenv("HERMES_BASE_URL"))
-            .apiKey(System.getenv("HERMES_API_KEY"))
-            .model("gpt-4")
             .build();
         
         // ========== 2. 创建 HermesApi（原始 API）==========

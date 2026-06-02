@@ -9,7 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * application.yml 中配置：
  *   hermes:
  *     base-url: ${HERMES_BASE_URL:http://localhost:8080}
- *     api-key: ${HERMES_API_KEY}  # 从环境变量读取，不写死在配置中
  * 
  * 其他参数使用 Builder 默认值，无需配置：
  *   - model: gpt-4
@@ -26,9 +25,6 @@ public class HermesProperties {
     
     /** Hermes Gateway 地址 */
     private String baseUrl = "http://localhost:8080";
-    
-    /** API Key */
-    private String apiKey;
     
     /** 默认模型 */
     private String model = "gpt-4";

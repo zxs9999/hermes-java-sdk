@@ -6,7 +6,6 @@ spring:
 # Hermes 配置（其他参数使用 Builder 默认值）
 hermes:
   base-url: ${HERMES_BASE_URL:http://localhost:8080}
-  # api-key 从 HERMES_API_KEY 环境变量读取
 
 # Server 配置
 server:
