@@ -6,17 +6,17 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Chat 请求体（OpenAI 兼容）
+ * OpenAI 兼容请求体
  */
 @Data
-public class ChatRequest {
+public class OpenAIRequest {
     
     private String model;
     private List<Map<String, String>> messages;
     private double temperature;
     private int maxTokens;
     
-    public ChatRequest() {
+    public OpenAIRequest() {
         this.messages = new ArrayList<>();
         this.temperature = 0.7;
         this.maxTokens = 4096;

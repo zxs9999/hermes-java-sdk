@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hermes.sdk.config.HermesConfig;
 import com.hermes.sdk.exception.*;
-import com.hermes.sdk.request.ChatRequest;
-import com.hermes.sdk.response.ChatResponse;
+import com.hermes.sdk.request.OpenAIRequest;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
@@ -63,7 +62,7 @@ public class HermesClient {
     public String chatWithSystemPrompt(String systemPrompt, String userMessage) {
         validateNotEmpty(userMessage, "用户消息不能为空");
         
-        ChatRequest request = new ChatRequest();
+        OpenAIRequest request = new OpenAIRequest();
         request.setModel(config.getModel());
         request.setTemperature(config.getTemperature());
         request.setMaxTokens(config.getMaxTokens());
