@@ -37,13 +37,6 @@ Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、
 | **健康检查** | 简单 + 详细两种模式 |
 | **Builder 模式** | 不可变配置，编译期校验 |
 
-## 环境变量
-
-```bash
-export HERMES_BASE_URL=http://localhost:8080
-export HERMES_API_KEY=your-api-key
-```
-
 ## 快速开始
 
 ### 1. Maven 依赖
