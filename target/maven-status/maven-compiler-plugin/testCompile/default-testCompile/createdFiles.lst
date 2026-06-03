@@ -4,4 +4,6 @@ com/hermes/sdk/client/HermesClientTest.class
 com/hermes/sdk/service/SessionServiceTest.class
 com/hermes/sdk/dto/DtoSerializationTest.class
 com/hermes/sdk/service/RunServiceTest.class
+com/hermes/sdk/performance/PerformanceTest.class
 com/hermes/sdk/service/SkillServiceTest.class
+com/hermes/sdk/security/SecurityTest.class

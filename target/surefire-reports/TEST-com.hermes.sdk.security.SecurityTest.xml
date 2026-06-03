@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.client.HermesClientTest" time="0.011" tests="11" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.security.SecurityTest" time="0.026" tests="14" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -53,15 +53,30 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testBuilderDefaultValues" classname="com.hermes.sdk.client.HermesClientTest" time="0.001"/>
-  <testcase name="testChatWithSystemPromptNullMessage" classname="com.hermes.sdk.client.HermesClientTest" time="0.001"/>
-  <testcase name="testBuilderCustomValues" classname="com.hermes.sdk.client.HermesClientTest" time="0.0"/>
-  <testcase name="testActivateSkillEmptyName" classname="com.hermes.sdk.client.HermesClientTest" time="0.0"/>
-  <testcase name="testActivateSkillEmptyTask" classname="com.hermes.sdk.client.HermesClientTest" time="0.0"/>
-  <testcase name="testChatWithSystemPromptEmptyMessage" classname="com.hermes.sdk.client.HermesClientTest" time="0.001"/>
-  <testcase name="testGetConfig" classname="com.hermes.sdk.client.HermesClientTest" time="0.001"/>
-  <testcase name="testChatNullMessage" classname="com.hermes.sdk.client.HermesClientTest" time="0.0"/>
-  <testcase name="testChatEmptyMessage" classname="com.hermes.sdk.client.HermesClientTest" time="0.001"/>
-  <testcase name="testHealthCheck" classname="com.hermes.sdk.client.HermesClientTest" time="0.001"/>
-  <testcase name="testActivateSkillNullTask" classname="com.hermes.sdk.client.HermesClientTest" time="0.001"/>
+  <testcase name="testActivateSkillXssPayload" classname="com.hermes.sdk.security.SecurityTest" time="0.003">
+    <system-out><![CDATA[10:33:28.660 [main] INFO  com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] >>> activateSkill() skill=skill, msg=<script>alert('xss')</script>
+10:33:28.661 [main] ERROR com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] activateSkill() skill=skill 失败: code=NETWORK_ERROR, msg=网络错误: Failed to connect to localhost/127.0.0.1:9999
+]]></system-out>
+  </testcase>
+  <testcase name="testNetworkExceptionContainsNoSensitiveData" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
+  <testcase name="testBaseUrlWithNull" classname="com.hermes.sdk.security.SecurityTest" time="0.007"/>
+  <testcase name="testBaseUrlWithPathTraversal" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
+  <testcase name="testResponseBodyClosedAfterError" classname="com.hermes.sdk.security.SecurityTest" time="0.002">
+    <system-out><![CDATA[10:33:28.672 [main] DEBUG com.hermes.sdk.transport.HttpTransport - [HERMES_HTTP_REQUEST] GET /test
+10:33:28.673 [main] ERROR com.hermes.sdk.transport.HttpTransport - [HERMES_HTTP_ERROR] API 错误: http=500, body=error
+]]></system-out>
+  </testcase>
+  <testcase name="testHttpTransportClosesResources" classname="com.hermes.sdk.security.SecurityTest" time="0.002"/>
+  <testcase name="testActivateSkillEmptyName" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
+  <testcase name="testActivateSkillSqlInjectionPayload" classname="com.hermes.sdk.security.SecurityTest" time="0.002">
+    <system-out><![CDATA[10:33:28.676 [main] INFO  com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] >>> activateSkill() skill=skill, msg='; DROP TABLE users; --
+10:33:28.677 [main] ERROR com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] activateSkill() skill=skill 失败: code=NETWORK_ERROR, msg=网络错误: Failed to connect to localhost/127.0.0.1:9999
+]]></system-out>
+  </testcase>
+  <testcase name="testApiExceptionDoesNotExposeStackTraceToCaller" classname="com.hermes.sdk.security.SecurityTest" time="0.0"/>
+  <testcase name="testChatNullMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.0"/>
+  <testcase name="testChatEmptyMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.0"/>
+  <testcase name="testChatWhitespaceMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.0"/>
+  <testcase name="testActivateSkillNullName" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
+  <testcase name="testActivateSkillNullTask" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
 </testsuite>

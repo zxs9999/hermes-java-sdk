@@ -2,6 +2,8 @@
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/config/HermesConfigTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/dto/DtoSerializationTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/exception/HermesExceptionTest.java
+/home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/performance/PerformanceTest.java
+/home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/security/SecurityTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/service/RunServiceTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/service/SessionServiceTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/service/SkillServiceTest.java
