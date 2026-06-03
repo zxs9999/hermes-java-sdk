@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.exception.HermesExceptionTest" time="0.004" tests="6" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.service.SessionServiceTest" time="0.099" tests="11" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -7,6 +7,7 @@
     <property name="java.vm.vendor" value="Eclipse Adoptium"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
     <property name="os.name" value="Linux"/>
     <property name="java.vm.specification.version" value="17"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
@@ -53,10 +54,58 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testBaseException" classname="com.hermes.sdk.exception.HermesExceptionTest" time="0.0"/>
-  <testcase name="testAuthException" classname="com.hermes.sdk.exception.HermesExceptionTest" time="0.0"/>
-  <testcase name="testNetworkException" classname="com.hermes.sdk.exception.HermesExceptionTest" time="0.0"/>
-  <testcase name="testApiExceptionWithDetail" classname="com.hermes.sdk.exception.HermesExceptionTest" time="0.001"/>
-  <testcase name="testBaseExceptionWithCause" classname="com.hermes.sdk.exception.HermesExceptionTest" time="0.0"/>
-  <testcase name="testApiException" classname="com.hermes.sdk.exception.HermesExceptionTest" time="0.0"/>
+  <testcase name="testCreateSuccess" classname="com.hermes.sdk.service.SessionServiceTest" time="0.065">
+    <system-out><![CDATA[09:02:55.359 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_CREATE] 创建空白会话
+09:02:55.422 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_CREATE] 成功: sessionId=new-sess
+]]></system-out>
+  </testcase>
+  <testcase name="testGetSuccess" classname="com.hermes.sdk.service.SessionServiceTest" time="0.003">
+    <system-out><![CDATA[09:02:55.425 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_GET] sessionId=s1
+]]></system-out>
+  </testcase>
+  <testcase name="testDeleteSuccess" classname="com.hermes.sdk.service.SessionServiceTest" time="0.002">
+    <system-out><![CDATA[09:02:55.429 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_DELETE] sessionId=s1
+09:02:55.429 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_DELETE] 成功: sessionId=s1
+]]></system-out>
+  </testcase>
+  <testcase name="testListWithPagination" classname="com.hermes.sdk.service.SessionServiceTest" time="0.008">
+    <system-out><![CDATA[09:02:55.431 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_LIST] limit=10, offset=5
+09:02:55.436 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_LIST] 成功: count=1
+]]></system-out>
+  </testcase>
+  <testcase name="testDelete404" classname="com.hermes.sdk.service.SessionServiceTest" time="0.002">
+    <system-out><![CDATA[09:02:55.439 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_DELETE] sessionId=not-exist
+09:02:55.440 [main] ERROR com.hermes.sdk.service.SessionService - [HERMES_SESSION_DELETE] 失败: http=404, body=not found
+]]></system-out>
+  </testcase>
+  <testcase name="testGetMessagesSuccess" classname="com.hermes.sdk.service.SessionServiceTest" time="0.002">
+    <system-out><![CDATA[09:02:55.442 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_MESSAGES] sessionId=s1
+09:02:55.443 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_MESSAGES] 成功: count=2
+]]></system-out>
+  </testcase>
+  <testcase name="testCreate500" classname="com.hermes.sdk.service.SessionServiceTest" time="0.003">
+    <system-out><![CDATA[09:02:55.445 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_CREATE] 创建空白会话
+09:02:55.445 [main] ERROR com.hermes.sdk.service.SessionService - [HERMES_SESSION_CREATE] 失败: http=500, body=Internal Error
+]]></system-out>
+  </testcase>
+  <testcase name="testListHttpError" classname="com.hermes.sdk.service.SessionServiceTest" time="0.002">
+    <system-out><![CDATA[09:02:55.447 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_LIST] limit=20, offset=0
+09:02:55.448 [main] ERROR com.hermes.sdk.service.SessionService - [HERMES_SESSION_LIST] 失败: http=404, body=Not Found
+]]></system-out>
+  </testcase>
+  <testcase name="testGet404" classname="com.hermes.sdk.service.SessionServiceTest" time="0.002">
+    <system-out><![CDATA[09:02:55.450 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_GET] sessionId=not-exist
+09:02:55.450 [main] ERROR com.hermes.sdk.service.SessionService - [HERMES_SESSION_GET] 失败: http=404, body=not found
+]]></system-out>
+  </testcase>
+  <testcase name="testGetMessages403" classname="com.hermes.sdk.service.SessionServiceTest" time="0.001">
+    <system-out><![CDATA[09:02:55.452 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_MESSAGES] sessionId=s1
+09:02:55.452 [main] ERROR com.hermes.sdk.service.SessionService - [HERMES_SESSION_MESSAGES] 失败: http=403, body=forbidden
+]]></system-out>
+  </testcase>
+  <testcase name="testListSuccess" classname="com.hermes.sdk.service.SessionServiceTest" time="0.003">
+    <system-out><![CDATA[09:02:55.454 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_LIST] limit=20, offset=0
+09:02:55.456 [main] INFO  com.hermes.sdk.service.SessionService - [HERMES_SESSION_LIST] 成功: count=2
+]]></system-out>
+  </testcase>
 </testsuite>

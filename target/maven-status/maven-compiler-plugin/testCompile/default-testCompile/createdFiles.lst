@@ -1,3 +1,5 @@
 com/hermes/sdk/config/HermesConfigTest.class
 com/hermes/sdk/exception/HermesExceptionTest.class
 com/hermes/sdk/client/HermesClientTest.class
+com/hermes/sdk/service/SessionServiceTest.class
+com/hermes/sdk/service/RunServiceTest.class
