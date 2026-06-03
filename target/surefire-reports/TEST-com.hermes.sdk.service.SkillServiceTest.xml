@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.service.RunServiceTest" time="1.484" tests="8" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.service.SkillServiceTest" time="0.049" tests="11" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -53,44 +53,80 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testStartRunSuccess" classname="com.hermes.sdk.service.RunServiceTest" time="1.455">
-    <system-out><![CDATA[09:52:00.185 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_START] 启动异步 Agent: message=hello, model=null, mode=null
-09:52:00.217 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_START] 成功: run_id=r1
+  <testcase name="testExecuteAsyncSuccess" classname="com.hermes.sdk.service.SkillServiceTest" time="0.026">
+    <system-out><![CDATA[09:52:00.283 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ASYNC_START] skillName=rpg-design, task=task, async=true
+09:52:00.284 [pool-3-thread-1] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, task=task
+09:52:00.285 [pool-3-thread-1] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, resultSize=12 chars
+09:52:00.285 [pool-3-thread-1] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ASYNC_DONE] skillName=rpg-design, done, resultSize=12 chars
 ]]></system-out>
   </testcase>
-  <testcase name="testApproveRun403" classname="com.hermes.sdk.service.RunServiceTest" time="0.005">
-    <system-out><![CDATA[09:52:00.237 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_APPROVAL] 解决待审批: run_id=r1, approval=approve
-09:52:00.238 [main] ERROR com.hermes.sdk.service.RunService - [HERMES_RUN_APPROVAL] 失败: http=403, body=forbidden
+  <testcase name="testExecuteAsyncException" classname="com.hermes.sdk.service.SkillServiceTest" time="0.005">
+    <system-out><![CDATA[09:52:00.289 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ASYNC_START] skillName=rpg-design, task=task, async=true
+09:52:00.290 [pool-4-thread-1] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, task=task
+09:52:00.291 [pool-4-thread-1] ERROR com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, failed: errorCode=API_ERROR, msg=SKILL_ERROR
+09:52:00.291 [pool-4-thread-1] ERROR com.hermes.sdk.service.SkillService - [HERMES_SKILL_ASYNC_ERROR] skillName=rpg-design, async failed: errorCode=API_ERROR, msg=SKILL_ERROR
 ]]></system-out>
   </testcase>
-  <testcase name="testStartRunWithOptions" classname="com.hermes.sdk.service.RunServiceTest" time="0.003">
-    <system-out><![CDATA[09:52:00.241 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_START] 启动异步 Agent: message=task, model=gpt-4, mode=agent
-09:52:00.243 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_START] 成功: run_id=r2
+  <testcase name="testExecuteExceptionPropagated" classname="com.hermes.sdk.service.SkillServiceTest" time="0.001">
+    <system-out><![CDATA[09:52:00.293 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, task=task
+09:52:00.293 [main] ERROR com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, failed: errorCode=API_ERROR, msg=SKILL_ERROR
 ]]></system-out>
   </testcase>
-  <testcase name="testGetRunStatus404" classname="com.hermes.sdk.service.RunServiceTest" time="0.002">
-    <system-out><![CDATA[09:52:00.245 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_STATUS] 查询运行状态: run_id=not-exist
-09:52:00.245 [main] ERROR com.hermes.sdk.service.RunService - [HERMES_RUN_STATUS] 失败: http=404, body=not found
+  <testcase name="testExecuteSuccess" classname="com.hermes.sdk.service.SkillServiceTest" time="0.001">
+    <system-out><![CDATA[09:52:00.294 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, task=task-content
+09:52:00.295 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, resultSize=6 chars
 ]]></system-out>
   </testcase>
-  <testcase name="testGetRunStatusSuccess" classname="com.hermes.sdk.service.RunServiceTest" time="0.002">
-    <system-out><![CDATA[09:52:00.247 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_STATUS] 查询运行状态: run_id=r1
-09:52:00.248 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_STATUS] 成功: status=completed
+  <testcase name="testGenerateBid" classname="com.hermes.sdk.service.SkillServiceTest" time="0.002">
+    <system-out><![CDATA[09:52:00.297 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] generateBid, requirementLength=11
+09:52:00.298 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=tender-writing, task=根据以下需求生成投标书：
+
+requirement
+09:52:00.298 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=tender-writing, resultSize=7 chars
 ]]></system-out>
   </testcase>
-  <testcase name="testApproveRunApprove" classname="com.hermes.sdk.service.RunServiceTest" time="0.003">
-    <system-out><![CDATA[09:52:00.250 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_APPROVAL] 解决待审批: run_id=r1, approval=approve
-09:52:00.251 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_APPROVAL] 成功
+  <testcase name="testWriteNovelChapter" classname="com.hermes.sdk.service.SkillServiceTest" time="0.002">
+    <system-out><![CDATA[09:52:00.299 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] writeNovelChapter, outlineLength=7
+09:52:00.299 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=novel-writing, task=根据以下大纲写小说章节：
+
+outline
+09:52:00.300 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=novel-writing, resultSize=7 chars
 ]]></system-out>
   </testcase>
-  <testcase name="testApproveRunReject" classname="com.hermes.sdk.service.RunServiceTest" time="0.002">
-    <system-out><![CDATA[09:52:00.253 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_APPROVAL] 解决待审批: run_id=r1, approval=reject
-09:52:00.254 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_APPROVAL] 成功
+  <testcase name="testGenerateDesign" classname="com.hermes.sdk.service.SkillServiceTest" time="0.001">
+    <system-out><![CDATA[09:52:00.301 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] generateDesign, sourceLength=11
+09:52:00.301 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, task=基于以下源码生成设计文档：
+
+source code
+09:52:00.301 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, resultSize=6 chars
 ]]></system-out>
   </testcase>
-  <testcase name="testStartRun500" classname="com.hermes.sdk.service.RunServiceTest" time="0.002">
-    <system-out><![CDATA[09:52:00.256 [main] INFO  com.hermes.sdk.service.RunService - [HERMES_RUN_START] 启动异步 Agent: message=msg, model=null, mode=null
-09:52:00.256 [main] ERROR com.hermes.sdk.service.RunService - [HERMES_RUN_START] 失败: http=500, body=server error
+  <testcase name="testShutdown" classname="com.hermes.sdk.service.SkillServiceTest" time="0.002">
+    <system-out><![CDATA[09:52:00.303 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SESSION_CLEAR] shutdown executor
+]]></system-out>
+  </testcase>
+  <testcase name="testTranslatePythonToJava" classname="com.hermes.sdk.service.SkillServiceTest" time="0.001">
+    <system-out><![CDATA[09:52:00.304 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] translatePythonToJava, codeLength=11
+09:52:00.304 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=python-to-java, task=将以下 Python 代码翻译为 Java：
+
+python code
+09:52:00.305 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=python-to-java, resultSize=9 chars
+]]></system-out>
+  </testcase>
+  <testcase name="testReviewCode" classname="com.hermes.sdk.service.SkillServiceTest" time="0.002">
+    <system-out><![CDATA[09:52:00.306 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] reviewCode, codeLength=4
+09:52:00.306 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=code-review, task=审查以下代码：
+
+code
+09:52:00.306 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=code-review, resultSize=6 chars
+]]></system-out>
+  </testcase>
+  <testcase name="testRpgToJava" classname="com.hermes.sdk.service.SkillServiceTest" time="0.001">
+    <system-out><![CDATA[09:52:00.307 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] rpgToJava, sourceLength=15
+09:52:00.307 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, task=读取以下 RPG 源码，生成设计文档：
+
+RPG SOURCE CODE
+09:52:00.308 [main] INFO  com.hermes.sdk.service.SkillService - [HERMES_SKILL_ACTIVATE] skillName=rpg-design, resultSize=10 chars
 ]]></system-out>
   </testcase>
 </testsuite>
