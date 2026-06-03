@@ -1,4 +1,5 @@
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/client/HermesClientTest.java
+/home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/client/ThreadSafeChatSessionTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/config/HermesConfigTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/dto/DtoSerializationTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/exception/HermesExceptionTest.java

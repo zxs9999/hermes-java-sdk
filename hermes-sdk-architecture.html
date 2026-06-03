@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes Java SDK Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'JetBrains Mono', monospace; background: #020617; min-height: 100vh; padding: 2rem; color: white; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot { width: 12px; height: 12px; background: #22d3ee; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container { background: rgba(15, 23, 42, 0.5); border-radius: 1rem; border: 1px solid #1e293b; padding: 1.5rem; overflow-x: auto; }
+    svg { width: 100%; min-width: 900px; display: block; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 2rem; }
+    .card { background: rgba(15, 23, 42, 0.5); border-radius: 0.75rem; border: 1px solid #1e293b; padding: 1.25rem; }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card-dot.orange { background: #fb923c; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.7rem; }
+    .card li { margin-bottom: 0.3rem; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>Hermes Java SDK Architecture</h1>
+      </div>
+      <p class="subtitle">Layered Java SDK for Hermes Agent — 80 tests, Transport abstraction, Thread-safe</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1000 820">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+          </marker>
+          <marker id="arrowhead-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24"/>
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)"/>
+
+        <!-- === LAYER 1: Client (User-facing) === -->
+        <text x="20" y="50" fill="#22d3ee" font-size="9" font-weight="600">CLIENT LAYER</text>
+        <rect x="20" y="60" width="960" height="120" rx="8" fill="rgba(8, 51, 68, 0.25)" stroke="#22d3ee" stroke-width="1"/>
+
+        <!-- HermesClient -->
+        <rect x="40" y="80" width="160" height="85" rx="6" fill="rgba(6, 78, 59, 0.5)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="120" y="100" fill="white" font-size="11" font-weight="600" text-anchor="middle">HermesClient</text>
+        <text x="120" y="116" fill="#94a3b8" font-size="8" text-anchor="middle">chat()</text>
+        <text x="120" y="130" fill="#94a3b8" font-size="8" text-anchor="middle">chatWithSystemPrompt()</text>
+        <text x="120" y="144" fill="#94a3b8" font-size="8" text-anchor="middle">activateSkill()</text>
+        <text x="120" y="158" fill="#34d399" font-size="7" text-anchor="middle">Builder pattern</text>
+
+        <!-- ThreadSafeChatSession -->
+        <rect x="230" y="80" width="160" height="85" rx="6" fill="rgba(6, 78, 59, 0.5)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="310" y="100" fill="white" font-size="11" font-weight="600" text-anchor="middle">ThreadSafeChatSession</text>
+        <text x="310" y="116" fill="#94a3b8" font-size="8" text-anchor="middle">chat(msg) → multi-turn</text>
+        <text x="310" y="130" fill="#94a3b8" font-size="8" text-anchor="middle">CopyOnWriteArrayList</text>
+        <text x="310" y="144" fill="#94a3b8" font-size="8" text-anchor="middle">synchronized wrapper</text>
+        <text x="310" y="158" fill="#34d399" font-size="7" text-anchor="middle">thread-safe</text>
+
+        <!-- ChatSession -->
+        <rect x="420" y="80" width="140" height="85" rx="6" fill="rgba(6, 78, 59, 0.35)" stroke="#34d399" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="490" y="100" fill="white" font-size="11" font-weight="600" text-anchor="middle">ChatSession</text>
+        <text x="490" y="116" fill="#94a3b8" font-size="8" text-anchor="middle">basic multi-turn</text>
+        <text x="490" y="130" fill="#94a3b8" font-size="8" text-anchor="middle">context accumulation</text>
+        <text x="490" y="158" fill="#94a3b8" font-size="7" text-anchor="middle">legacy</text>
+
+        <!-- HermesProperties -->
+        <rect x="590" y="80" width="150" height="85" rx="6" fill="rgba(8, 51, 68, 0.5)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="665" y="100" fill="white" font-size="11" font-weight="600" text-anchor="middle">HermesProperties</text>
+        <text x="665" y="116" fill="#94a3b8" font-size="8" text-anchor="middle">Spring Boot config</text>
+        <text x="665" y="130" fill="#94a3b8" font-size="8" text-anchor="middle">@ConfigurationProperties</text>
+        <text x="665" y="144" fill="#94a3b8" font-size="8" text-anchor="middle">application.yml</text>
+        <text x="665" y="158" fill="#22d3ee" font-size="7" text-anchor="middle">Spring Boot 3.x</text>
+
+        <!-- HermesController -->
+        <rect x="770" y="80" width="190" height="85" rx="6" fill="rgba(8, 51, 68, 0.5)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="865" y="100" fill="white" font-size="11" font-weight="600" text-anchor="middle">HermesController</text>
+        <text x="865" y="116" fill="#94a3b8" font-size="8" text-anchor="middle">REST endpoints</text>
+        <text x="865" y="130" fill="#94a3b8" font-size="8" text-anchor="middle">@RestController</text>
+        <text x="865" y="144" fill="#94a3b8" font-size="8" text-anchor="middle">HTTP adapter layer</text>
+        <text x="865" y="158" fill="#22d3ee" font-size="7" text-anchor="middle">optional</text>
+
+        <!-- === LAYER 2: SDK (Business) === -->
+        <text x="20" y="195" fill="#34d399" font-size="9" font-weight="600">SDK LAYER</text>
+        <rect x="20" y="205" width="960" height="150" rx="8" fill="rgba(6, 78, 59, 0.2)" stroke="#34d399" stroke-width="1"/>
+
+        <!-- HermesSdk -->
+        <rect x="40" y="225" width="180" height="115" rx="6" fill="rgba(6, 78, 59, 0.5)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="130" y="245" fill="white" font-size="11" font-weight="600" text-anchor="middle">HermesSdk</text>
+        <text x="130" y="261" fill="#94a3b8" font-size="8" text-anchor="middle">config + httpClient</text>
+        <text x="130" y="275" fill="#94a3b8" font-size="8" text-anchor="middle">objectMapper</text>
+        <text x="130" y="289" fill="#94a3b8" font-size="8" text-anchor="middle">───── sub-modules ─────</text>
+        <text x="130" y="303" fill="#94a3b8" font-size="8" text-anchor="middle">.sessions()</text>
+        <text x="130" y="317" fill="#94a3b8" font-size="8" text-anchor="middle">.toolsets().system()</text>
+        <text x="130" y="334" fill="#34d399" font-size="7" text-anchor="middle">fluent API</text>
+
+        <!-- SessionManager -->
+        <rect x="240" y="225" width="155" height="115" rx="6" fill="rgba(6, 78, 59, 0.35)" stroke="#34d399" stroke-width="1"/>
+        <text x="317" y="245" fill="white" font-size="10" font-weight="600" text-anchor="middle">SessionManager</text>
+        <text x="317" y="261" fill="#94a3b8" font-size="8" text-anchor="middle">create / delete</text>
+        <text x="317" y="275" fill="#94a3b8" font-size="8" text-anchor="middle">listRecent(limit)</text>
+        <text x="317" y="289" fill="#94a3b8" font-size="8" text-anchor="middle">in-memory cache</text>
+        <text x="317" y="303" fill="#94a3b8" font-size="8" text-anchor="middle">TTL expiry</text>
+        <text x="317" y="317" fill="#94a3b8" font-size="8" text-anchor="middle">cache eviction</text>
+        <text x="317" y="334" fill="#64748b" font-size="7" text-anchor="middle">CopyOnWriteMap</text>
+
+        <!-- ToolsetManager -->
+        <rect x="415" y="225" width="155" height="115" rx="6" fill="rgba(6, 78, 59, 0.35)" stroke="#34d399" stroke-width="1"/>
+        <text x="492" y="245" fill="white" font-size="10" font-weight="600" text-anchor="middle">ToolsetManager</text>
+        <text x="492" y="261" fill="#94a3b8" font-size="8" text-anchor="middle">listEnabled()</text>
+        <text x="492" y="275" fill="#94a3b8" font-size="8" text-anchor="middle">findByName(name)</text>
+        <text x="492" y="289" fill="#94a3b8" font-size="8" text-anchor="middle">getTools(toolset)</text>
+        <text x="492" y="303" fill="#94a3b8" font-size="8" text-anchor="middle">lazy caching</text>
+        <text x="492" y="317" fill="#94a3b8" font-size="8" text-anchor="middle">cache refresh</text>
+        <text x="492" y="334" fill="#64748b" font-size="7" text-anchor="middle">Optional wrapper</text>
+
+        <!-- SkillExecutor -->
+        <rect x="590" y="225" width="155" height="115" rx="6" fill="rgba(6, 78, 59, 0.35)" stroke="#34d399" stroke-width="1"/>
+        <text x="667" y="245" fill="white" font-size="10" font-weight="600" text-anchor="middle">SkillExecutor</text>
+        <text x="667" y="261" fill="#94a3b8" font-size="8" text-anchor="middle">execute(skill, task)</text>
+        <text x="667" y="275" fill="#94a3b8" font-size="8" text-anchor="middle">executeAsync()</text>
+        <text x="667" y="289" fill="#94a3b8" font-size="8" text-anchor="middle">CompletableFuture</text>
+        <text x="667" y="303" fill="#94a3b8" font-size="8" text-anchor="middle">ExecutorService</text>
+        <text x="667" y="317" fill="#94a3b8" font-size="8" text-anchor="middle">rpgToJava() shortcut</text>
+        <text x="667" y="334" fill="#64748b" font-size="7" text-anchor="middle">cached thread pool</text>
+
+        <!-- SystemMonitor -->
+        <rect x="765" y="225" width="195" height="115" rx="6" fill="rgba(6, 78, 59, 0.35)" stroke="#34d399" stroke-width="1"/>
+        <text x="862" y="245" fill="white" font-size="10" font-weight="600" text-anchor="middle">SystemMonitor</text>
+        <text x="862" y="261" fill="#94a3b8" font-size="8" text-anchor="middle">isHealthy()</text>
+        <text x="862" y="275" fill="#94a3b8" font-size="8" text-anchor="middle">getCapabilities()</text>
+        <text x="862" y="289" fill="#94a3b8" font-size="8" text-anchor="middle">healthDetailed()</text>
+        <text x="862" y="303" fill="#94a3b8" font-size="8" text-anchor="middle">capability flags</text>
+        <text x="862" y="317" fill="#94a3b8" font-size="8" text-anchor="middle">status aggregation</text>
+        <text x="862" y="334" fill="#64748b" font-size="7" text-anchor="middle">sysmon module</text>
+
+        <!-- === LAYER 3: Service === -->
+        <text x="20" y="370" fill="#fb923c" font-size="9" font-weight="600">SERVICE LAYER</text>
+        <rect x="20" y="380" width="960" height="130" rx="8" fill="rgba(251, 146, 60, 0.1)" stroke="#fb923c" stroke-width="1"/>
+
+        <!-- SessionService -->
+        <rect x="40" y="400" width="195" height="95" rx="6" fill="rgba(251, 146, 60, 0.25)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="137" y="420" fill="white" font-size="10" font-weight="600" text-anchor="middle">SessionService</text>
+        <text x="137" y="436" fill="#94a3b8" font-size="8" text-anchor="middle">list / get / create / delete</text>
+        <text x="137" y="450" fill="#94a3b8" font-size="8" text-anchor="middle">getMessages(sessionId)</text>
+        <text x="137" y="464" fill="#94a3b8" font-size="8" text-anchor="middle">CRUD + pagination</text>
+        <text x="137" y="478" fill="#fb923c" font-size="7" text-anchor="middle">11 tests</text>
+        <text x="137" y="490" fill="#64748b" font-size="7" text-anchor="middle">11 tests</text>
+
+        <!-- RunService -->
+        <rect x="255" y="400" width="195" height="95" rx="6" fill="rgba(251, 146, 60, 0.25)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="352" y="420" fill="white" font-size="10" font-weight="600" text-anchor="middle">RunService</text>
+        <text x="352" y="436" fill="#94a3b8" font-size="8" text-anchor="middle">startRun() → async</text>
+        <text x="352" y="450" fill="#94a3b8" font-size="8" text-anchor="middle">getRunStatus() / approveRun()</text>
+        <text x="352" y="464" fill="#94a3b8" font-size="8" text-anchor="middle">state machine: pending→done</text>
+        <text x="352" y="478" fill="#fb923c" font-size="7" text-anchor="middle">8 tests</text>
+
+        <!-- SkillService -->
+        <rect x="470" y="400" width="195" height="95" rx="6" fill="rgba(251, 146, 60, 0.25)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="567" y="420" fill="white" font-size="10" font-weight="600" text-anchor="middle">SkillService</text>
+        <text x="567" y="436" fill="#94a3b8" font-size="8" text-anchor="middle">execute() / executeAsync()</text>
+        <text x="567" y="450" fill="#94a3b8" font-size="8" text-anchor="middle">rpgToJava / generateBid</text>
+        <text x="567" y="464" fill="#94a3b8" font-size="8" text-anchor="middle">generateDesign / reviewCode</text>
+        <text x="567" y="478" fill="#fb923c" font-size="7" text-anchor="middle">11 tests</text>
+
+        <!-- ApiServerService -->
+        <rect x="685" y="400" width="275" height="95" rx="6" fill="rgba(251, 146, 60, 0.15)" stroke="#fb923c" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="822" y="420" fill="white" font-size="10" font-weight="600" text-anchor="middle">ApiServerService</text>
+        <text x="822" y="436" fill="#94a3b8" font-size="8" text-anchor="middle">Gateway API bridge</text>
+        <text x="822" y="450" fill="#94a3b8" font-size="8" text-anchor="middle">skills / toolsets / capabilities</text>
+        <text x="822" y="464" fill="#94a3b8" font-size="8" text-anchor="middle">capability flags + status</text>
+        <text x="822" y="478" fill="#64748b" font-size="7" text-anchor="middle">gateway proxy</text>
+
+        <!-- === LAYER 4: Core/Api === -->
+        <text x="20" y="525" fill="#a78bfa" font-size="9" font-weight="600">CORE / API LAYER</text>
+        <rect x="20" y="535" width="960" height="100" rx="8" fill="rgba(76, 29, 149, 0.2)" stroke="#a78bfa" stroke-width="1"/>
+
+        <!-- HermesApi -->
+        <rect x="40" y="555" width="920" height="65" rx="6" fill="rgba(76, 29, 149, 0.35)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="150" y="577" fill="white" font-size="11" font-weight="600" text-anchor="middle">HermesApi</text>
+        <text x="150" y="591" fill="#94a3b8" font-size="8" text-anchor="middle">1:1 mapping to gateway</text>
+        <text x="500" y="577" fill="#a78bfa" font-size="9" text-anchor="middle">Skills</text>
+        <text x="500" y="591" fill="#94a3b8" font-size="8" text-anchor="middle">listSkills() listToolsets()</text>
+        <text x="700" y="577" fill="#a78bfa" font-size="9" text-anchor="middle">Sessions</text>
+        <text x="700" y="591" fill="#94a3b8" font-size="8" text-anchor="middle">CRUD + messages</text>
+        <text x="870" y="577" fill="#a78bfa" font-size="9" text-anchor="middle">Runs</text>
+        <text x="870" y="591" fill="#94a3b8" font-size="8" text-anchor="middle">start/get/approve/stop</text>
+
+        <!-- === LAYER 5: Transport === -->
+        <text x="20" y="650" fill="#fbbf24" font-size="9" font-weight="600">TRANSPORT LAYER</text>
+        <rect x="20" y="660" width="960" height="110" rx="8" fill="rgba(120, 53, 15, 0.2)" stroke="#fbbf24" stroke-width="1"/>
+
+        <!-- Transport Interface -->
+        <rect x="40" y="680" width="140" height="75" rx="6" fill="rgba(120, 53, 15, 0.4)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="110" y="702" fill="white" font-size="10" font-weight="600" text-anchor="middle">Transport</text>
+        <text x="110" y="716" fill="#94a3b8" font-size="8" text-anchor="middle">interface</text>
+        <text x="110" y="730" fill="#94a3b8" font-size="8" text-anchor="middle">get / post / patch / delete</text>
+        <text x="110" y="744" fill="#fbbf24" font-size="7" text-anchor="middle">contract</text>
+
+        <!-- HttpTransport -->
+        <rect x="200" y="680" width="180" height="75" rx="6" fill="rgba(6, 78, 59, 0.5)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="290" y="702" fill="white" font-size="10" font-weight="600" text-anchor="middle">HttpTransport</text>
+        <text x="290" y="716" fill="#94a3b8" font-size="8" text-anchor="middle">OkHttp implementation</text>
+        <text x="290" y="730" fill="#94a3b8" font-size="8" text-anchor="middle">Jackson mapper</text>
+        <text x="290" y="744" fill="#34d399" font-size="7" text-anchor="middle">✓ implemented</text>
+
+        <!-- RpcTransport -->
+        <rect x="400" y="680" width="165" height="75" rx="6" fill="rgba(120, 53, 15, 0.2)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="482" y="702" fill="#94a3b8" font-size="10" font-weight="600" text-anchor="middle">RpcTransport</text>
+        <text x="482" y="716" fill="#64748b" font-size="8" text-anchor="middle">gRPC / Thrift</text>
+        <text x="482" y="730" fill="#64748b" font-size="8" text-anchor="middle">placeholder</text>
+        <text x="482" y="744" fill="#fbbf24" font-size="7" text-anchor="middle">○ future</text>
+
+        <!-- WebSocketTransport -->
+        <rect x="585" y="680" width="175" height="75" rx="6" fill="rgba(120, 53, 15, 0.2)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="672" y="702" fill="#94a3b8" font-size="10" font-weight="600" text-anchor="middle">WebSocketTransport</text>
+        <text x="672" y="716" fill="#64748b" font-size="8" text-anchor="middle">SSE / WebSocket</text>
+        <text x="672" y="730" fill="#64748b" font-size="8" text-anchor="middle">placeholder</text>
+        <text x="672" y="744" fill="#fbbf24" font-size="7" text-anchor="middle">○ future</text>
+
+        <!-- TransportType Enum -->
+        <rect x="780" y="680" width="180" height="75" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1"/>
+        <text x="870" y="702" fill="white" font-size="10" font-weight="600" text-anchor="middle">TransportType</text>
+        <text x="870" y="716" fill="#94a3b8" font-size="8" text-anchor="middle">enum: HTTP / RPC / WS</text>
+        <text x="870" y="730" fill="#94a3b8" font-size="8" text-anchor="middle">Builder selection</text>
+        <text x="870" y="744" fill="#fbbf24" font-size="7" text-anchor="middle">extensible</text>
+
+        <!-- === LAYER 6: Infrastructure === -->
+        <text x="20" y="785" fill="#94a3b8" font-size="9" font-weight="600">INFRASTRUCTURE</text>
+        <rect x="20" y="795" width="960" height="75" rx="8" fill="rgba(30, 41, 59, 0.5)" stroke="#475569" stroke-width="1"/>
+
+        <!-- OkHttp -->
+        <rect x="40" y="808" width="130" height="48" rx="6" fill="rgba(30, 41, 59, 0.6)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="105" y="824" fill="white" font-size="10" font-weight="600" text-anchor="middle">OkHttp 4.12</text>
+        <text x="105" y="838" fill="#94a3b8" font-size="7" text-anchor="middle">HTTP client</text>
+
+        <!-- Jackson -->
+        <rect x="190" y="808" width="130" height="48" rx="6" fill="rgba(30, 41, 59, 0.6)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="255" y="824" fill="white" font-size="10" font-weight="600" text-anchor="middle">Jackson 2.17</text>
+        <text x="255" y="838" fill="#94a3b8" font-size="7" text-anchor="middle">JSON serialization</text>
+
+        <!-- Log4j2 -->
+        <rect x="340" y="808" width="130" height="48" rx="6" fill="rgba(30, 41, 59, 0.6)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="405" y="824" fill="white" font-size="10" font-weight="600" text-anchor="middle">Log4j2 2.24</text>
+        <text x="405" y="838" fill="#94a3b8" font-size="7" text-anchor="middle">logging framework</text>
+
+        <!-- SLF4J -->
+        <rect x="490" y="808" width="130" height="48" rx="6" fill="rgba(30, 41, 59, 0.6)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="555" y="824" fill="white" font-size="10" font-weight="600" text-anchor="middle">SLF4J 2.0</text>
+        <text x="555" y="838" fill="#94a3b8" font-size="7" text-anchor="middle">api facade</text>
+
+        <!-- JUnit -->
+        <rect x="640" y="808" width="130" height="48" rx="6" fill="rgba(30, 41, 59, 0.6)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="705" y="824" fill="white" font-size="10" font-weight="600" text-anchor="middle">JUnit 5.11</text>
+        <text x="705" y="838" fill="#94a3b8" font-size="7" text-anchor="middle">testing framework</text>
+
+        <!-- Spring Boot -->
+        <rect x="790" y="808" width="170" height="48" rx="6" fill="rgba(30, 41, 59, 0.6)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="875" y="824" fill="white" font-size="10" font-weight="600" text-anchor="middle">Spring Boot 3.3</text>
+        <text x="875" y="838" fill="#94a3b8" font-size="7" text-anchor="middle">optional starter</text>
+
+        <!-- === LEGEND === -->
+        <text x="20" y="30" fill="white" font-size="10" font-weight="600">Legend</text>
+        <rect x="20" y="42" width="14" height="9" rx="2" fill="rgba(6, 78, 59, 0.5)" stroke="#34d399" stroke-width="1"/>
+        <text x="40" y="50" fill="#94a3b8" font-size="8">Client / SDK</text>
+        <rect x="100" y="42" width="14" height="9" rx="2" fill="rgba(251, 146, 60, 0.25)" stroke="#fb923c" stroke-width="1"/>
+        <text x="120" y="50" fill="#94a3b8" font-size="8">Service</text>
+        <rect x="170" y="42" width="14" height="9" rx="2" fill="rgba(76, 29, 149, 0.35)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="190" y="50" fill="#94a3b8" font-size="8">Core/Api</text>
+        <rect x="240" y="42" width="14" height="9" rx="2" fill="rgba(120, 53, 15, 0.4)" stroke="#fbbf24" stroke-width="1"/>
+        <text x="260" y="50" fill="#94a3b8" font-size="8">Transport</text>
+        <rect x="320" y="42" width="14" height="9" rx="2" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="340" y="50" fill="#94a3b8" font-size="8">Infra</text>
+        <line x1="410" y1="47" x2="430" y2="47" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="436" y="50" fill="#94a3b8" font-size="8">Placeholder</text>
+        <line x1="510" y1="47" x2="530" y2="47" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="536" y="50" fill="#94a3b8" font-size="8">call</text>
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>Client Layer</h3>
+        </div>
+        <ul>
+          <li>• HermesClient — main entry point</li>
+          <li>• ThreadSafeChatSession — thread-safe multi-turn</li>
+          <li>• ChatSession — basic multi-turn</li>
+          <li>• HermesProperties — Spring Boot config</li>
+          <li>• HermesController — REST adapter (optional)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>SDK / Business Layer</h3>
+        </div>
+        <ul>
+          <li>• HermesSdk — fluent API facade</li>
+          <li>• SessionManager — CRUD + cache</li>
+          <li>• ToolsetManager — toolset query + cache</li>
+          <li>• SkillExecutor — async skill execution</li>
+          <li>• SystemMonitor — health / capabilities</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot violet"></div>
+          <h3>Core / Transport</h3>
+        </div>
+        <ul>
+          <li>• HermesApi — raw API (1:1 gateway)</li>
+          <li>• Transport interface — pluggable</li>
+          <li>• HttpTransport — OkHttp (✓ impl)</li>
+          <li>• RpcTransport — gRPC (○ future)</li>
+          <li>• WebSocketTransport — SSE (○ future)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot rose"></div>
+          <h3>Exception Hierarchy</h3>
+        </div>
+        <ul>
+          <li>• HermesException — base (errorCode + status)</li>
+          <li>• HermesNetworkException — network errors (-1)</li>
+          <li>• HermesApiException — API errors (4xx/5xx)</li>
+          <li>• HermesAuthException — auth errors (401)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Testing Coverage</h3>
+        </div>
+        <ul>
+          <li>• Config (4) + Exception (6) + DTO (7)</li>
+          <li>• Client (11) — builder, validation</li>
+          <li>• SessionService (11) + RunService (8)</li>
+          <li>• SkillService (11) — mock HermesClient</li>
+          <li>• Security (14) — injection defense</li>
+          <li>• Performance (8) — timeout, concurrency</li>
+          <li>• Total: 80 tests, all passing</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot orange"></div>
+          <h3>Key Design Decisions</h3>
+        </div>
+        <ul>
+          <li>• No apiKey/model — baseUrl only</li>
+          <li>• No Lombok — manual getter/setter</li>
+          <li>• Transport abstraction — hot-swap</li>
+          <li>• Immutable config (final fields)</li>
+          <li>• CompletableFuture for async</li>
+          <li>• Log4j2 over Logback (2.24.1)</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer">
+      Hermes Java SDK • 6-layer architecture • 80 tests • Transport-pluggable • Thread-safe
+    </p>
+  </div>
+</body>
+</html>

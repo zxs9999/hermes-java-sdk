@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 
@@ -28,12 +30,14 @@ public class ThreadSafeChatSession {
     
     private final HermesClient client;
     private final HermesConfig config;
-    private final CopyOnWriteArrayList<Message> history;
+    private final List<Message> history;
+    private final ReadWriteLock lock;
     
     public ThreadSafeChatSession(HermesClient client, HermesConfig config) {
         this.client = client;
         this.config = config;
-        this.history = new CopyOnWriteArrayList<>();
+        this.history = new ArrayList<>();
+        this.lock = new ReentrantReadWriteLock();
     }
     
     /**
@@ -41,10 +45,22 @@ public class ThreadSafeChatSession {
      */
     public String chat(String message) {
         log.debug("[{}] 发送消息: {}", LogEvents.CHAT_REQUEST, maskContent(message));
-        history.add(new Message("user", message));
+        
+        lock.writeLock().lock();
+        try {
+            history.add(new Message("user", message));
+        } finally {
+            lock.writeLock().unlock();
+        }
         
         String response = sendToHermes();
-        history.add(new Message("assistant", response));
+        
+        lock.writeLock().lock();
+        try {
+            history.add(new Message("assistant", response));
+        } finally {
+            lock.writeLock().unlock();
+        }
         
         log.debug("[{}] 收到响应: {} chars, historySize={}", 
             LogEvents.CHAT_RESPONSE, response.length(), history.size());
@@ -90,14 +106,24 @@ public class ThreadSafeChatSession {
      * 获取对话历史（只读副本）
      */
     public List<Message> getHistory() {
-        return Collections.unmodifiableList(new ArrayList<>(history));
+        lock.readLock().lock();
+        try {
+            return Collections.unmodifiableList(new ArrayList<>(history));
+        } finally {
+            lock.readLock().unlock();
+        }
     }
     
     /**
      * 清空对话历史
      */
     public void clear() {
-        history.clear();
+        lock.writeLock().lock();
+        try {
+            history.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
         log.info("[{}] history cleared, historySize=0", LogEvents.SESSION_CLEAR);
     }
     

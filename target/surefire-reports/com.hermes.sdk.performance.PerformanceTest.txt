@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.hermes.sdk.performance.PerformanceTest
 -------------------------------------------------------------------------------
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.681 s -- in com.hermes.sdk.performance.PerformanceTest
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.729 s -- in com.hermes.sdk.performance.PerformanceTest

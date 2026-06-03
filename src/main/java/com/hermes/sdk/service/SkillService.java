@@ -12,6 +12,13 @@ import org.slf4j.Logger;
  * Skill 激活服务
  * 
  * 提供便捷的 Skill 调用封装 + 异步支持
+ * 
+ * 线程池配置：
+ * - 核心线程数：4
+ * - 最大线程数：8（高负载时扩容）
+ * - 空闲存活：60秒
+ * - 队列容量：100（有界，防止 OOM）
+ * - 拒绝策略：CallerRunsPolicy（回退到调用者线程）
  */
 public class SkillService {
     
@@ -21,7 +28,22 @@ public class SkillService {
     private final ExecutorService executor;
     
     public SkillService(HermesClient client) {
-        this(client, Executors.newCachedThreadPool());
+        this(client, createBoundedThreadPool());
+    }
+    
+    private static ExecutorService createBoundedThreadPool() {
+        return new ThreadPoolExecutor(
+            4,                          // 核心线程数
+            8,                          // 最大线程数
+            60L, TimeUnit.SECONDS,      // 空闲存活
+            new LinkedBlockingQueue<>(100),  // 有界队列
+            r -> {
+                Thread t = new Thread(r, "Hermes-Skill-" + System.currentTimeMillis() % 1000);
+                t.setDaemon(true);  // 守护线程，不阻止 JVM 退出
+                return t;
+            },
+            new ThreadPoolExecutor.CallerRunsPolicy()  // 拒绝时回退到调用者
+        );
     }
     
     public SkillService(HermesClient client, ExecutorService executor) {
