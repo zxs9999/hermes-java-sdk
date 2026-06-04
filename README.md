@@ -3,7 +3,7 @@
 [![Maven](https://img.shields.io/badge/Maven-1.0.0-blue)](https://search.maven.org/artifact/com.hermes/hermes-sdk)
 [![Java](https://img.shields.io/badge/Java-17%2B-brightgreen)](https://www.oracle.com/java/technologies/javase/17-relnote-issues.html)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-80%20passed-brightgreen)](#测试覆盖)
+[![Tests](https://img.shields.io/badge/Tests-130%20passed-brightgreen)](#测试覆盖)
 
 Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、线程安全、传输层可扩展。
 
@@ -42,6 +42,66 @@ String novel = session.chat("开始写第1章");
 // 健康检查
 if (hermes.healthCheck()) {
     System.out.println("连接正常");
+}
+```
+
+## Webhook 集成
+
+外部系统通过 Webhook 触发 Hermes Agent 执行异步任务（如标书生成、通知推送）。Webhook 是 Hermes 暴露给外部的唯一 HTTP 入口。
+
+### 前置条件
+
+在 Hermes 的 `~/.hermes/config.yaml` 中预配置 Webhook 路由：
+
+```yaml
+platforms:
+  webhook:
+    extra:
+      host: 0.0.0.0
+      port: 8644
+      routes:
+        bid_draft:
+          secret: "bid-secret-2024"
+          prompt: "为项目 {project_name} 生成标书草案"
+          skills: ["bid-generation"]
+          deliver: "telegram"
+          deliver_extra:
+            chat_id: "your-chat-id"
+```
+
+### Java SDK 触发 Webhook
+
+```java
+// 1. 配置 Webhook
+WebhookConfig config = WebhookConfig.builder()
+    .baseUrl("http://hermes-gateway:8644")
+    .secret("bid-secret-2024")           // 与 Hermes config.yaml 一致
+    .maxRetries(3)                        // 5xx 自动重试
+    .build();
+
+WebhookClient webhooks = new WebhookClient(config);
+
+// 2. 触发 Webhook（异步，立即返回）
+WebhookResponse resp = webhooks.trigger("bid_draft", Map.of(
+    "project_name", "BD2010",
+    "project_type", "设计",
+    "requirements", "三天内交付"
+));
+
+// resp.getStatus() = "accepted"
+// resp.getDeliveryId() = "wh-abc123"  （用于追踪）
+```
+
+### 错误处理
+
+```java
+try {
+    WebhookResponse resp = webhooks.trigger("bid_draft", payload);
+} catch (HermesApiException e) {
+    // 4xx 客户端错误（签名错误、路由不存在）
+    // 5xx 重试耗尽
+} catch (HermesNetworkException e) {
+    // 网络错误
 }
 ```
 
@@ -206,7 +266,7 @@ HermesClient hermes = HermesClient.builder()
 
 ## 测试覆盖
 
-**80 tests，覆盖 9 个模块：**
+**130 tests，覆盖 12 个模块：**
 
 | 模块 | 测试数 | 覆盖内容 |
 |------|--------|---------|
@@ -214,11 +274,15 @@ HermesClient hermes = HermesClient.builder()
 | Exception | 6 | 4层异常体系 |
 | DTO | 7 | Jackson 序列化/反序列化 |
 | Client | 11 | Builder、参数校验、健康检查 |
+| **ThreadSafeChatSession** | **14** | 多轮对话/读写锁/并发安全 |
 | SessionService | 11 | CRUD + 成功/错误场景 |
 | RunService | 8 | 异步 Run + 审批流程 |
 | SkillService | 11 | execute/async + 便捷方法 |
 | **Security** | **14** | 输入校验、XSS/SQL 注入防御 |
 | **Performance** | **8** | 超时、并发、大响应、重试 |
+| **Webhook (新)** | **15** | HMAC 签名/HTTP 触发/重试/4xx 5xx/IO 错误 |
+| **HMACSigner (新)** | **10** | 签名生成/边界场景/Unicode |
+| **WebhookConfig (新)** | **11** | Builder 验证/默认值/自定义参数 |
 
 ```
 mvn test   # 运行所有测试
@@ -350,12 +414,17 @@ src/main/java/com/hermes/sdk/
 │   ├── ApiServerService.java
 │   ├── SessionService.java
 │   └── RunService.java
-└── transport/
-    ├── Transport.java          — 接口定义
-    ├── TransportType.java      — HTTP/RPC/WEBSOCKET
-    ├── HttpTransport.java       — 当前实现
-    ├── RpcTransport.java       — 占位符
-    └── WebSocketTransport.java — 占位符
+├── transport/
+│   ├── Transport.java          — 接口定义
+│   ├── TransportType.java      — HTTP/RPC/WEBSOCKET
+│   ├── HttpTransport.java       — 当前实现
+│   ├── RpcTransport.java       — 占位符
+│   └── WebSocketTransport.java — 占位符
+└── webhook/                    — ✨ 新增
+    ├── WebhookClient.java      — Webhook 触发客户端
+    ├── WebhookConfig.java      — Builder 配置
+    ├── WebhookResponse.java    — 响应封装
+    └── HMACSigner.java         — HMAC-SHA256 签名工具
 
 src/main/resources/
 ├── application.yml
@@ -425,6 +494,18 @@ src/test/java/com/hermes/sdk/
 - 文档：Javadoc 注释所有 public 方法
 
 ## Changelog
+
+### [1.1.0] - 2026-06-04
+
+**新增**
+- `WebhookClient` 外部系统集成模块（HMAC-SHA256 签名 + 4xx/5xx/IO 重试）
+- `WebhookConfig` Builder 配置（超时、重试次数、退避时间）
+- `HMACSigner` 独立签名工具
+- Webhook 集成文档（前置条件、用法、错误处理、Spring Boot 示例）
+- 36 个新测试：WebhookClient(15) + HMACSigner(10) + WebhookConfig(11)
+
+**改进**
+- 不依赖 mockwebserver（aliyun 镜像不可用），改用 JDK 内置 `HttpServer` mock
 
 ### [1.0.0] - 2026-06-03
 

@@ -27,3 +27,7 @@
 /home/jack/hermesTall/hermes-sdk/src/main/java/com/hermes/sdk/transport/Transport.java
 /home/jack/hermesTall/hermes-sdk/src/main/java/com/hermes/sdk/transport/TransportType.java
 /home/jack/hermesTall/hermes-sdk/src/main/java/com/hermes/sdk/transport/WebSocketTransport.java
+/home/jack/hermesTall/hermes-sdk/src/main/java/com/hermes/sdk/webhook/HMACSigner.java
+/home/jack/hermesTall/hermes-sdk/src/main/java/com/hermes/sdk/webhook/WebhookClient.java
+/home/jack/hermesTall/hermes-sdk/src/main/java/com/hermes/sdk/webhook/WebhookConfig.java
+/home/jack/hermesTall/hermes-sdk/src/main/java/com/hermes/sdk/webhook/WebhookResponse.java

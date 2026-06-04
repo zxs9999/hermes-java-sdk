@@ -1,6 +1,7 @@
 com/hermes/sdk/service/ApiServerService.class
 com/hermes/sdk/Demo.class
 com/hermes/sdk/transport/TransportType.class
+com/hermes/sdk/webhook/WebhookResponse.class
 com/hermes/sdk/service/RunService.class
 com/hermes/sdk/logging/HermesLogger.class
 com/hermes/sdk/dto/RunEvent.class
@@ -19,6 +20,7 @@ com/hermes/sdk/dto/ToolsetsResponse.class
 com/hermes/sdk/core/HermesApi$10.class
 com/hermes/sdk/core/HermesApi$7.class
 com/hermes/sdk/dto/Session.class
+com/hermes/sdk/webhook/WebhookClient.class
 com/hermes/sdk/service/RunService$4.class
 com/hermes/sdk/service/SessionService.class
 com/hermes/sdk/client/ThreadSafeChatSession.class
@@ -40,13 +42,16 @@ com/hermes/sdk/service/RunService$3.class
 com/hermes/sdk/client/ThreadSafeChatSession$Message.class
 com/hermes/sdk/service/SessionService$1.class
 com/hermes/sdk/config/HermesConfig$Builder.class
+com/hermes/sdk/webhook/WebhookConfig.class
 com/hermes/sdk/sdk/HermesSdk.class
+com/hermes/sdk/webhook/HMACSigner.class
 com/hermes/sdk/sdk/HermesSdk$SystemMonitor.class
 com/hermes/sdk/transport/RpcTransport.class
 com/hermes/sdk/sdk/HermesSdk$ToolsetManager.class
 com/hermes/sdk/sdk/HermesSdk$SkillExecutor.class
 com/hermes/sdk/config/HermesConfig.class
 com/hermes/sdk/service/SkillService.class
+com/hermes/sdk/webhook/WebhookConfig$Builder.class
 com/hermes/sdk/core/HermesApi$5.class
 com/hermes/sdk/service/ApiServerService$1.class
 com/hermes/sdk/service/ApiServerService$4.class

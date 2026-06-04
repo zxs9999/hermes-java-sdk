@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.security.SecurityTest" time="0.027" tests="14" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.webhook.WebhookClientTest" time="0.368" tests="15" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -52,30 +52,76 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testActivateSkillXssPayload" classname="com.hermes.sdk.security.SecurityTest" time="0.003">
-    <system-out><![CDATA[10:56:53.195 [main] INFO  com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] >>> activateSkill() skill=skill, msg=<script>alert('xss')</script>
-10:56:53.197 [main] ERROR com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] activateSkill() skill=skill 失败: code=NETWORK_ERROR, msg=网络错误: Failed to connect to localhost/127.0.0.1:9999
+  <testcase name="testTriggerWhitespaceRouteNameThrows" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.016"/>
+  <testcase name="testTrigger4xxDoesNotRetry" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.05">
+    <system-out><![CDATA[10:56:53.583 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.584 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test, url=http://127.0.0.1:20208/webhooks/test, payloadKeys=[k]
+10:56:53.621 [main] WARN  com.hermes.sdk.webhook.WebhookClient - Webhook rejected: status=401, body={"error":"invalid signature"}
 ]]></system-out>
   </testcase>
-  <testcase name="testNetworkExceptionContainsNoSensitiveData" classname="com.hermes.sdk.security.SecurityTest" time="0.0"/>
-  <testcase name="testBaseUrlWithNull" classname="com.hermes.sdk.security.SecurityTest" time="0.002"/>
-  <testcase name="testBaseUrlWithPathTraversal" classname="com.hermes.sdk.security.SecurityTest" time="0.0"/>
-  <testcase name="testResponseBodyClosedAfterError" classname="com.hermes.sdk.security.SecurityTest" time="0.003">
-    <system-out><![CDATA[10:56:53.203 [main] DEBUG com.hermes.sdk.transport.HttpTransport - [HERMES_HTTP_REQUEST] GET /test
-10:56:53.204 [main] ERROR com.hermes.sdk.transport.HttpTransport - [HERMES_HTTP_ERROR] API 错误: http=500, body=error
+  <testcase name="testTriggerEmptyRouteNameThrows" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.004"/>
+  <testcase name="testTriggerNullRouteNameThrows" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.01"/>
+  <testcase name="testTriggerSendsContentTypeHeader" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.02">
+    <system-out><![CDATA[10:56:53.646 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.647 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test, url=http://127.0.0.1:19798/webhooks/test, payloadKeys=[]
+10:56:53.650 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Webhook triggered successfully: status=202, response={"status":"accepted","delivery_id":"wh-default"}
 ]]></system-out>
   </testcase>
-  <testcase name="testHttpTransportClosesResources" classname="com.hermes.sdk.security.SecurityTest" time="0.003"/>
-  <testcase name="testActivateSkillEmptyName" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testActivateSkillSqlInjectionPayload" classname="com.hermes.sdk.security.SecurityTest" time="0.003">
-    <system-out><![CDATA[10:56:53.211 [main] INFO  com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] >>> activateSkill() skill=skill, msg='; DROP TABLE users; --
-10:56:53.212 [main] ERROR com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] activateSkill() skill=skill 失败: code=NETWORK_ERROR, msg=网络错误: Failed to connect to localhost/127.0.0.1:9999
+  <testcase name="testTrigger5xxRetriesExhaustedThrows" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.094">
+    <system-out><![CDATA[10:56:53.661 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.661 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test, url=http://127.0.0.1:20550/webhooks/test, payloadKeys=[k]
+10:56:53.664 [main] WARN  com.hermes.sdk.webhook.WebhookClient - Webhook 5xx, retrying in 0ms (attempt 1/2): status=500
+10:56:53.707 [main] WARN  com.hermes.sdk.webhook.WebhookClient - Webhook 5xx, retrying in 0ms (attempt 2/2): status=500
 ]]></system-out>
   </testcase>
-  <testcase name="testApiExceptionDoesNotExposeStackTraceToCaller" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testChatNullMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testChatEmptyMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.002"/>
-  <testcase name="testChatWhitespaceMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testActivateSkillNullName" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testActivateSkillNullTask" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
+  <testcase name="testTriggerWithHMACSignatureHeader" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.006">
+    <system-out><![CDATA[10:56:53.754 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.755 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test_route, url=http://127.0.0.1:20604/webhooks/test_route, payloadKeys=[k]
+10:56:53.757 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Webhook triggered successfully: status=202, response={"status":"accepted","delivery_id":"wh-default"}
+]]></system-out>
+  </testcase>
+  <testcase name="testTrigger5xxRetriesUntilSuccess" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.097">
+    <system-out><![CDATA[10:56:53.764 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.765 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test, url=http://127.0.0.1:19218/webhooks/test, payloadKeys=[k]
+10:56:53.767 [main] WARN  com.hermes.sdk.webhook.WebhookClient - Webhook 5xx, retrying in 0ms (attempt 1/2): status=500
+10:56:53.811 [main] WARN  com.hermes.sdk.webhook.WebhookClient - Webhook 5xx, retrying in 0ms (attempt 2/2): status=500
+10:56:53.855 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Webhook triggered successfully: status=202, response={"status":"accepted","delivery_id":"wh-default"}
+]]></system-out>
+  </testcase>
+  <testcase name="testTriggerNullPayloadThrows" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.004"/>
+  <testcase name="testTriggerHandlesEmptyResponseBody" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.015">
+    <system-out><![CDATA[10:56:53.870 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.871 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test, url=http://127.0.0.1:20164/webhooks/test, payloadKeys=[k]
+10:56:53.874 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Webhook triggered successfully: status=202, response=
+]]></system-out>
+  </testcase>
+  <testcase name="testTriggerSendsCorrectBody" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.013">
+    <system-out><![CDATA[10:56:53.884 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.884 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test, url=http://127.0.0.1:19110/webhooks/test, payloadKeys=[amount, project_name]
+10:56:53.887 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Webhook triggered successfully: status=202, response={"status":"accepted","delivery_id":"wh-default"}
+]]></system-out>
+  </testcase>
+  <testcase name="testTriggerSendsCorrectPath" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.006">
+    <system-out><![CDATA[10:56:53.891 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.891 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=my_route, url=http://127.0.0.1:19858/webhooks/my_route, payloadKeys=[]
+10:56:53.893 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Webhook triggered successfully: status=202, response={"status":"accepted","delivery_id":"wh-default"}
+]]></system-out>
+  </testcase>
+  <testcase name="testTriggerSuccess" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.01">
+    <system-out><![CDATA[10:56:53.901 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.901 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=bid_draft, url=http://127.0.0.1:20302/webhooks/bid_draft, payloadKeys=[project_name, project_type]
+10:56:53.903 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Webhook triggered successfully: status=202, response={"status":"accepted","delivery_id":"wh-default"}
+]]></system-out>
+  </testcase>
+  <testcase name="testTriggerParsesDeliveryIdFromResponse" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.012">
+    <system-out><![CDATA[10:56:53.911 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.912 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test, url=http://127.0.0.1:20664/webhooks/test, payloadKeys=[k]
+10:56:53.914 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Webhook triggered successfully: status=202, response={"status":"accepted","delivery_id":"wh-12345","message":"queued"}
+]]></system-out>
+  </testcase>
+  <testcase name="testTriggerIOExceptionFailsWithNetworkException" classname="com.hermes.sdk.webhook.WebhookClientTest" time="0.007">
+    <system-out><![CDATA[10:56:53.922 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.922 [main] INFO  com.hermes.sdk.webhook.WebhookClient - Triggering webhook: route=test, url=http://127.0.0.1:1/webhooks/test, payloadKeys=[k]
+]]></system-out>
+  </testcase>
 </testsuite>

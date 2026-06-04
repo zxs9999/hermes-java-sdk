@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.security.SecurityTest" time="0.027" tests="14" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hermes.sdk.webhook.HMACSignerTest" time="0.016" tests="10" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -52,30 +52,42 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testActivateSkillXssPayload" classname="com.hermes.sdk.security.SecurityTest" time="0.003">
-    <system-out><![CDATA[10:56:53.195 [main] INFO  com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] >>> activateSkill() skill=skill, msg=<script>alert('xss')</script>
-10:56:53.197 [main] ERROR com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] activateSkill() skill=skill 失败: code=NETWORK_ERROR, msg=网络错误: Failed to connect to localhost/127.0.0.1:9999
+  <testcase name="testSignEmptyBody" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.004">
+    <system-out><![CDATA[10:56:53.540 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
 ]]></system-out>
   </testcase>
-  <testcase name="testNetworkExceptionContainsNoSensitiveData" classname="com.hermes.sdk.security.SecurityTest" time="0.0"/>
-  <testcase name="testBaseUrlWithNull" classname="com.hermes.sdk.security.SecurityTest" time="0.002"/>
-  <testcase name="testBaseUrlWithPathTraversal" classname="com.hermes.sdk.security.SecurityTest" time="0.0"/>
-  <testcase name="testResponseBodyClosedAfterError" classname="com.hermes.sdk.security.SecurityTest" time="0.003">
-    <system-out><![CDATA[10:56:53.203 [main] DEBUG com.hermes.sdk.transport.HttpTransport - [HERMES_HTTP_REQUEST] GET /test
-10:56:53.204 [main] ERROR com.hermes.sdk.transport.HttpTransport - [HERMES_HTTP_ERROR] API 错误: http=500, body=error
+  <testcase name="testSignNullSecretThrows" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.001"/>
+  <testcase name="testSignNullBodyTreatedAsEmpty" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.002">
+    <system-out><![CDATA[10:56:53.543 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.543 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
 ]]></system-out>
   </testcase>
-  <testcase name="testHttpTransportClosesResources" classname="com.hermes.sdk.security.SecurityTest" time="0.003"/>
-  <testcase name="testActivateSkillEmptyName" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testActivateSkillSqlInjectionPayload" classname="com.hermes.sdk.security.SecurityTest" time="0.003">
-    <system-out><![CDATA[10:56:53.211 [main] INFO  com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] >>> activateSkill() skill=skill, msg='; DROP TABLE users; --
-10:56:53.212 [main] ERROR com.hermes.sdk.client.HermesClient - [HERMES_SKILL_ACTIVATE] activateSkill() skill=skill 失败: code=NETWORK_ERROR, msg=网络错误: Failed to connect to localhost/127.0.0.1:9999
+  <testcase name="testSignProducesValidHex" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.001">
+    <system-out><![CDATA[10:56:53.544 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
 ]]></system-out>
   </testcase>
-  <testcase name="testApiExceptionDoesNotExposeStackTraceToCaller" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testChatNullMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testChatEmptyMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.002"/>
-  <testcase name="testChatWhitespaceMessage" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testActivateSkillNullName" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
-  <testcase name="testActivateSkillNullTask" classname="com.hermes.sdk.security.SecurityTest" time="0.001"/>
+  <testcase name="testSignDifferentBodiesProduceDifferentSignatures" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.002">
+    <system-out><![CDATA[10:56:53.545 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.546 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+]]></system-out>
+  </testcase>
+  <testcase name="testSignDifferentSecretsProduceDifferentSignatures" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.001">
+    <system-out><![CDATA[10:56:53.549 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.549 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+]]></system-out>
+  </testcase>
+  <testcase name="testSignUnicodeBody" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.0">
+    <system-out><![CDATA[10:56:53.550 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+]]></system-out>
+  </testcase>
+  <testcase name="testSignEmptySecretThrows" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.0"/>
+  <testcase name="testSignDeterministic" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.001">
+    <system-out><![CDATA[10:56:53.552 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+10:56:53.552 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+]]></system-out>
+  </testcase>
+  <testcase name="testSignWithKnownAlgorithm" classname="com.hermes.sdk.webhook.HMACSignerTest" time="0.001">
+    <system-out><![CDATA[10:56:53.553 [main] DEBUG com.hermes.sdk.webhook.HMACSigner - HMAC signature generated: length=64
+]]></system-out>
+  </testcase>
 </testsuite>
