@@ -3,7 +3,7 @@
 [![Maven](https://img.shields.io/badge/Maven-1.0.0-blue)](https://search.maven.org/artifact/com.hermes/hermes-sdk)
 [![Java](https://img.shields.io/badge/Java-17%2B-brightgreen)](https://www.oracle.com/java/technologies/javase/17-relnote-issues.html)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-130%20passed-brightgreen)](#测试覆盖)
+[![Tests](https://img.shields.io/badge/Tests-174%20passed-brightgreen)](#测试覆盖)
 
 Hermes Agent 的 Java SDK，支持 Spring Boot 3.x，提供工业级鲁棒性、线程安全、传输层可扩展。
 
@@ -266,7 +266,7 @@ HermesClient hermes = HermesClient.builder()
 
 ## 测试覆盖
 
-**130 tests，覆盖 12 个模块：**
+**174 tests，覆盖 14 个模块：**
 
 | 模块 | 测试数 | 覆盖内容 |
 |------|--------|---------|
@@ -280,9 +280,12 @@ HermesClient hermes = HermesClient.builder()
 | SkillService | 11 | execute/async + 便捷方法 |
 | **Security** | **14** | 输入校验、XSS/SQL 注入防御 |
 | **Performance** | **8** | 超时、并发、大响应、重试 |
-| **Webhook (新)** | **15** | HMAC 签名/HTTP 触发/重试/4xx 5xx/IO 错误 |
-| **HMACSigner (新)** | **10** | 签名生成/边界场景/Unicode |
-| **WebhookConfig (新)** | **11** | Builder 验证/默认值/自定义参数 |
+| **WebhookClient** | **15** | HMAC 签名/HTTP 触发/重试/4xx 5xx/IO 错误 |
+| **HMACSigner** | **10** | 签名生成/边界场景/Unicode |
+| **HMACCompatibility (新)** | **11** | 跨语言兼容/标准测试向量 |
+| **WebhookConfig** | **11** | Builder 验证/默认值/自定义参数 |
+| **WebhookConfigAdvanced (新)** | **15** | 边界值/不可变性/Unicode |
+| **WebhookIntegration (新)** | **18** | 端到端/并发/大 payload/多种 HTTP 状态码 |
 
 ```
 mvn test   # 运行所有测试
@@ -502,7 +505,7 @@ src/test/java/com/hermes/sdk/
 - `WebhookConfig` Builder 配置（超时、重试次数、退避时间）
 - `HMACSigner` 独立签名工具
 - Webhook 集成文档（前置条件、用法、错误处理、Spring Boot 示例）
-- 36 个新测试：WebhookClient(15) + HMACSigner(10) + WebhookConfig(11)
+- 80 个 webhook 测试：WebhookClient(15) + HMACSigner(10) + HMACCompatibility(11) + WebhookConfig(11) + WebhookConfigAdvanced(15) + WebhookIntegration(18)
 
 **改进**
 - 不依赖 mockwebserver（aliyun 镜像不可用），改用 JDK 内置 `HttpServer` mock

@@ -8,7 +8,10 @@
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/service/RunServiceTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/service/SessionServiceTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/service/SkillServiceTest.java
+/home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/webhook/HMACCompatibilityTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/webhook/HMACSignerTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/webhook/MockWebhookServer.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/webhook/WebhookClientTest.java
+/home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/webhook/WebhookConfigAdvancedTest.java
 /home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/webhook/WebhookConfigTest.java
+/home/jack/hermesTall/hermes-sdk/src/test/java/com/hermes/sdk/webhook/WebhookIntegrationTest.java

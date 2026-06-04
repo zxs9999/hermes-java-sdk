@@ -5,12 +5,15 @@ com/hermes/sdk/client/ThreadSafeChatSessionTest.class
 com/hermes/sdk/dto/DtoSerializationTest.class
 com/hermes/sdk/webhook/MockWebhookServer.class
 com/hermes/sdk/webhook/WebhookClientTest.class
+com/hermes/sdk/webhook/WebhookConfigAdvancedTest.class
 com/hermes/sdk/webhook/MockWebhookServer$MockRequest.class
 com/hermes/sdk/security/SecurityTest.class
 com/hermes/sdk/config/HermesConfigTest.class
+com/hermes/sdk/webhook/WebhookIntegrationTest.class
 com/hermes/sdk/service/SessionServiceTest.class
 com/hermes/sdk/service/RunServiceTest.class
 com/hermes/sdk/performance/PerformanceTest.class
 com/hermes/sdk/webhook/MockWebhookServer$MockResponse.class
 com/hermes/sdk/webhook/WebhookConfigTest.class
 com/hermes/sdk/service/SkillServiceTest.class
+com/hermes/sdk/webhook/HMACCompatibilityTest.class
